@@ -1,0 +1,2 @@
+2022.11.12 21:53:45 INFO  tracing is disabled for protocol LSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /Users/knix/.config/nvim/.metals/lsp.trace.json or /Users/knix/Library/Caches/org.scalameta.metals/lsp.trace.json[0m
+2022.11.12 21:53:45 INFO  logging to file /Users/knix/dev/spack/.metals/metals.log[0m
