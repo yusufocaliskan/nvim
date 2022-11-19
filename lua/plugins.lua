@@ -9,12 +9,11 @@ vim.cmd [[packadd packer.nvim]]
 packer.startup(function(use)
   use 'wbthomason/packer.nvim'
   use  'hoob3rt/lualine.nvim' -- Statusline
-  
+
   use 'Shatur/neovim-ayu'
 
   use 'folke/which-key.nvim'
   use 'windwp/nvim-autopairs'
-
 
   use { "nvim-telescope/telescope-file-browser.nvim" }
   use {
@@ -23,7 +22,7 @@ packer.startup(function(use)
     requires = { {'nvim-lua/plenary.nvim'} }
   }
 
-  use {'akinsho/bufferline.nvim', tag = "v3.*", requires = 'nvim-tree/nvim-web-devicons'}
+  use {"akinsho/toggleterm.nvim", tag = '*' }
 
   use {
     'nvim-tree/nvim-tree.lua',
@@ -45,18 +44,19 @@ packer.startup(function(use)
     branch = "main",
   }
 
-  -- Scala
-  use { 
-    'hrsh7th/nvim-cmp', 
-    requires = { 
-      'hrsh7th/cmp-nvim-lsp', 
-      'hrsh7th/cmp-vsnip', 
+  use {
+    'hrsh7th/nvim-cmp',
+    requires = {
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-vsnip',
       'hrsh7th/cmp-buffer',
-      'hrsh7th/vim-vsnip', 
+      'hrsh7th/vim-vsnip',
       'hrsh7th/cmp-cmdline'
-    } }
-    use { 
-      'scalameta/nvim-metals',
-      requires = { "nvim-lua/plenary.nvim" } 
     }
-  end)
+  }
+  -- Scala
+  use {
+    'scalameta/nvim-metals',
+    requires = { "nvim-lua/plenary.nvim" }
+  }
+end)

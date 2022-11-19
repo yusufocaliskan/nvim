@@ -6,6 +6,19 @@ local telescope = require('telescope')
 local saga = require("lspsaga")
 
 require('nvim-autopairs').setup()
+require('toggleterm').setup()
+
+-- Gutter Symbols
+local signs = {
+    Error = "",
+    Warn = "",
+    Hint = "🧷",
+    Info = ""
+}
+for type, icon in pairs(signs) do
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, {text = icon, texthl = hl, numhl = hl})
+end
 
 saga.init_lsp_saga({
   border_style = "rounded",
@@ -48,7 +61,14 @@ keymap.set('i', '<C-s>', '<esc>:w<CR>', opts)
 keymap.set('n', '<C-s>', ':w<CR>', opts)
 keymap.set('i', 'jk', '<esc>', opts)
 
+keymap.set('n', '<leader>p', '"_dP', named_opts('Paste preserving register'))
 keymap.set('x', '<leader>p', '"_dP', named_opts('Paste preserving register'))
+
+-- leader yank to clipboard
+keymap.set('n', '<leader>y', '"+y', named_opts("Yank to clipboard"))
+keymap.set('v', '<leader>y', '"+y', named_opts("Yank to clipboard"))
+keymap.set('v', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
+
 
 -- Do not yank with x
 keymap.set('n', 'x', '"_x', opts)
@@ -67,8 +87,6 @@ keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Open buffer 
 keymap.set('n', '<leader>d', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
 keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
 keymap.set('n', '<leader>/', ts.live_grep, named_opts('Search Workspace'))
-keymap.set('n', '<leader>g', ts.git_status, named_opts('Git Status'))
-
 
 keymap.set('n', '<leader>t', "<cmd>Lspsaga open_floaterm<cr>", named_opts('Git Status'))
 keymap.set('t', '<leader>t', "<cmd>Lspsaga close_floaterm<cr>", named_opts('Git Status'))
@@ -96,18 +114,25 @@ keymap.set('n', 'gp', '<Cmd>BufferLineCyclePrev<CR>', named_opts('Previous Buffe
 keymap.set("n", "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", named_opts("Next Diagnostic"))
 keymap.set("n", "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", named_opts("Prev Diagnostic"))
 
+keymap.set("n", "] ", "o<esc>", named_opts("New line down"))
+keymap.set("n", "[ ", "O<esc>", named_opts("New line up"))
+
+
 -- Split
 keymap.set('n', 'ss', ':split<CR>', opts)
 keymap.set('n', 'sv', ':vsplit<CR>', opts)
 
+local augroup = vim.api.nvim_create_augroup
+local autocmd = vim.api.nvim_create_autocmd
+local yank_group = augroup('HighlightYank', {})
 
-wk.register({
-  g = {
-    name = 'goto',
-  }
+autocmd('TextYankPost', {
+    group = yank_group,
+    pattern = '*',
+    callback = function()
+        vim.highlight.on_yank({
+            higroup = 'IncSearch',
+            timeout = 40,
+        })
+    end,
 })
--- local builtin = require('telescope.builtin')
--- vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
--- vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
--- vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
--- vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
