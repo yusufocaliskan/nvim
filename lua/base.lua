@@ -30,6 +30,7 @@ vim.opt.backspace = 'start,eol,indent'
 vim.opt.path:append { '**' } -- Finding files, search into subfolders
 vim.opt.wildignore:append { '*/node_modules/*', '*/target/*' }
 vim.opt.relativenumber = true
+vim.opt.termguicolors = true
 
 vim.opt.timeoutlen = 200
 

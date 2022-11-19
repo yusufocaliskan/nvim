@@ -97,7 +97,6 @@ keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 keymap.set('n', '<cr>', "<cmd>Lspsaga lsp_finder<CR>", named_opts('Go to definition'))
 keymap.set('n', '<bs>', "<C-o>", named_opts('Go back'))
 
--- Bufferline numbers
 keymap.set('n', '<leader>1', '<Cmd>NvimTreeToggle<CR>', named_opts("Tree"))
 
 keymap.set('n', '<leader>q', '<cmd>q<cr>', named_opts('Quit window'))
@@ -107,8 +106,8 @@ keymap.set('n', '<leader>co', 'telescope.extensions.file_browser.', named_opts('
 
 -- Goto
 keymap.set('n', 'gr', ts.lsp_references, named_opts('Find references'))
-keymap.set('n', 'gn', '<Cmd>BufferLineCycleNext<CR>', named_opts('Next Buffer'))
-keymap.set('n', 'gp', '<Cmd>BufferLineCyclePrev<CR>', named_opts('Previous Buffer'))
+keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
+keymap.set('n', 'gp', '<Cmd>bprevious<CR>', named_opts('Previous Buffer'))
 
 -- Forward / Back
 keymap.set("n", "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", named_opts("Next Diagnostic"))
@@ -116,7 +115,6 @@ keymap.set("n", "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", named_opts("Prev 
 
 keymap.set("n", "] ", "o<esc>", named_opts("New line down"))
 keymap.set("n", "[ ", "O<esc>", named_opts("New line up"))
-
 
 -- Split
 keymap.set('n', 'ss', ':split<CR>', opts)
@@ -129,8 +127,7 @@ local lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = "floa
 function _lazygit_toggle()
   lazygit:toggle()
 end
-
-vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>", {noremap = true, silent = true, desc = "lazygit"})
 
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
@@ -142,7 +139,7 @@ autocmd('TextYankPost', {
     callback = function()
         vim.highlight.on_yank({
             higroup = 'IncSearch',
-            timeout = 40,
+            timeout = 50,
         })
     end,
 })
