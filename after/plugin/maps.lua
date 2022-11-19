@@ -6,7 +6,10 @@ local telescope = require('telescope')
 local saga = require("lspsaga")
 
 require('nvim-autopairs').setup()
-require('toggleterm').setup()
+require('toggleterm').setup({
+  open_mapping = [[<c-\>]],
+  direction = 'horizontal'
+})
 
 -- Gutter Symbols
 local signs = {
@@ -88,9 +91,6 @@ keymap.set('n', '<leader>d', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover
 keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
 keymap.set('n', '<leader>/', ts.live_grep, named_opts('Search Workspace'))
 
-keymap.set('n', '<leader>t', "<cmd>Lspsaga open_floaterm<cr>", named_opts('Git Status'))
-keymap.set('t', '<leader>t', "<cmd>Lspsaga close_floaterm<cr>", named_opts('Git Status'))
-
 keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 
 -- Enter and Backspace for navigation
@@ -121,6 +121,16 @@ keymap.set("n", "[ ", "O<esc>", named_opts("New line up"))
 -- Split
 keymap.set('n', 'ss', ':split<CR>', opts)
 keymap.set('n', 'sv', ':vsplit<CR>', opts)
+
+
+local Terminal  = require('toggleterm.terminal').Terminal
+local lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
+
+function _lazygit_toggle()
+  lazygit:toggle()
+end
+
+vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>", {noremap = true, silent = true})
 
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
