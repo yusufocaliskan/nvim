@@ -109,6 +109,7 @@ keymap.set('n', '<leader>co', 'telescope.extensions.file_browser.', named_opts('
 keymap.set('n', 'gr', ts.lsp_references, named_opts('Find references'))
 keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
 keymap.set('n', 'gp', '<Cmd>bprevious<CR>', named_opts('Previous Buffer'))
+keymap.set('n', 'gl', '<Cmd>Lspsaga show_line_diagnostics<CR>', named_opts('Previous Buffer'))
 
 -- Forward / Back
 keymap.set("n", "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", named_opts("Next Diagnostic"))
@@ -125,10 +126,7 @@ keymap.set("i", "<C-v>", '<esc>"+pi', named_opts("Paste from clipboard"))
 
 keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
 
--- Split
-keymap.set('n', 'ss', ':split<CR>', opts)
-keymap.set('n', 'sv', ':vsplit<CR>', opts)
-
+keymap.set("n", "<tab>", '<cmd>Gitsigns reset_hunk<CR>')
 
 local Terminal = require('toggleterm.terminal').Terminal
 local lazygit  = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })

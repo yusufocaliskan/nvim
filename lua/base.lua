@@ -32,7 +32,7 @@ vim.opt.wildignore:append { '*/node_modules/*', '*/target/*' }
 vim.opt.relativenumber = true
 vim.opt.termguicolors = true
 
-vim.opt.timeoutlen = 200
+vim.opt.timeoutlen = 40
 
 
 vim.api.nvim_create_autocmd("InsertLeave", {

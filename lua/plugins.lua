@@ -11,6 +11,7 @@ packer.startup(function(use)
   use  'hoob3rt/lualine.nvim' -- Statusline
 
   use 'Shatur/neovim-ayu'
+  use "ellisonleao/gruvbox.nvim"
 
   use 'folke/which-key.nvim'
   use 'windwp/nvim-autopairs'
