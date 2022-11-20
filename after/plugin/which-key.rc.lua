@@ -3,7 +3,6 @@ require('which-key').setup {
     separator = ''
   },
   window = {
-    border = 'none',
     position = 'right',
     border = 'single',
     padding = { 1, 1, 1, 1 },

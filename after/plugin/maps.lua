@@ -13,14 +13,14 @@ require('toggleterm').setup({
 
 -- Gutter Symbols
 local signs = {
-    Error = "",
-    Warn = "",
-    Hint = "🧷",
-    Info = ""
+  Error = "",
+  Warn = "",
+  Hint = "🧷",
+  Info = ""
 }
 for type, icon in pairs(signs) do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, {text = icon, texthl = hl, numhl = hl})
+  local hl = "DiagnosticSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
 
 saga.init_lsp_saga({
@@ -57,6 +57,7 @@ telescope.load_extension("file_browser")
 local function named_opts(desc)
   return { noremap = true, silent = true, desc = desc }
 end
+
 local opts = { noremap = true, silent = true }
 local keymap = vim.keymap
 
@@ -121,25 +122,29 @@ keymap.set('n', 'ss', ':split<CR>', opts)
 keymap.set('n', 'sv', ':vsplit<CR>', opts)
 
 
-local Terminal  = require('toggleterm.terminal').Terminal
-local lazygit = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
+local Terminal = require('toggleterm.terminal').Terminal
+local lazygit  = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
 
 function _lazygit_toggle()
   lazygit:toggle()
 end
-vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>", {noremap = true, silent = true, desc = "lazygit"})
+
+vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>",
+  { noremap = true, silent = true, desc = "lazygit" })
 
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 local yank_group = augroup('HighlightYank', {})
 
 autocmd('TextYankPost', {
-    group = yank_group,
-    pattern = '*',
-    callback = function()
-        vim.highlight.on_yank({
-            higroup = 'IncSearch',
-            timeout = 50,
-        })
-    end,
+  group = yank_group,
+  pattern = '*',
+  callback = function()
+    vim.highlight.on_yank({
+      higroup = 'IncSearch',
+      timeout = 50,
+    })
+  end,
 })
+
+vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()]]

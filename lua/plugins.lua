@@ -31,6 +31,12 @@ packer.startup(function(use)
 
   use { 'nvim-treesitter/nvim-treesitter' }
 
+  use {
+  'lewis6991/gitsigns.nvim'
+  -- tag = 'release' -- To use the latest release (do not use this if you run Neovim nightly or dev builds!)
+  }
+
+
   -- LSP
   use 'neovim/nvim-lspconfig'
   -- LSP status indicator
@@ -41,6 +47,7 @@ packer.startup(function(use)
     branch = "main",
   }
 
+  -- Completion
   use {
     'hrsh7th/nvim-cmp',
     requires = {
