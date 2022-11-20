@@ -15,7 +15,7 @@ require('toggleterm').setup({
 local signs = {
   Error = "",
   Warn = "",
-  Hint = "🧷",
+  Hint = "⌁",
   Info = ""
 }
 for type, icon in pairs(signs) do
@@ -25,7 +25,7 @@ end
 
 saga.init_lsp_saga({
   border_style = "rounded",
-  code_action_icon = "🧷",
+  code_action_icon = "⌁",
   code_action_lightbulb = {
     enable = true,
     enable_in_insert = false,
@@ -116,6 +116,14 @@ keymap.set("n", "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", named_opts("Prev 
 
 keymap.set("n", "] ", "o<esc>", named_opts("New line down"))
 keymap.set("n", "[ ", "O<esc>", named_opts("New line up"))
+keymap.set("n", "]g", "<cmd>Gitsigns next_hunk<cr>", named_opts("Next hunk"))
+keymap.set("n", "[g", "<cmd>Gitsigns prev_hunk<cr>", named_opts("Prev hunk"))
+
+keymap.set("n", "<C-v>", '"+p', named_opts("Paste from clipboard"))
+keymap.set("v", "<C-v>", '"+p', named_opts("Paste from clipboard"))
+keymap.set("i", "<C-v>", '<esc>"+pi', named_opts("Paste from clipboard"))
+
+keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
 
 -- Split
 keymap.set('n', 'ss', ':split<CR>', opts)
