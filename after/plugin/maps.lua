@@ -61,8 +61,12 @@ end
 local opts = { noremap = true, silent = true }
 local keymap = vim.keymap
 
-keymap.set('i', '<C-s>', '<esc>:w<CR>', opts)
+keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
+keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
+
 keymap.set('n', '<C-s>', ':w<CR>', opts)
+keymap.set('i', '<C-s>', '<esc>:w<CR>', opts)
+keymap.set('v', '<C-s>', '<esc>:w<CR>', opts)
 keymap.set('i', 'jk', '<esc>', opts)
 
 keymap.set('n', '<leader>p', '"_dP', named_opts('Paste preserving register'))
@@ -72,6 +76,9 @@ keymap.set('x', '<leader>p', '"_dP', named_opts('Paste preserving register'))
 keymap.set('n', '<leader>y', '"+y', named_opts("Yank to clipboard"))
 keymap.set('v', '<leader>y', '"+y', named_opts("Yank to clipboard"))
 keymap.set('v', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
+
+keymap.set('n', '<C-d>', '<C-d>zz', named_opts("Page down (centered)"))
+keymap.set('n', '<C-u>', '<C-u>zz', named_opts("Page up (centered)"))
 
 
 -- Do not yank with x
@@ -86,11 +93,15 @@ keymap.set('n', '<leader>a', 'ggVG', named_opts('Select entire buffer'))
 keymap.set('n', '<leader>f', telescope.extensions.file_browser.file_browser, named_opts('Open file picker'))
 keymap.set('n', '<leader> ', ts.find_files, named_opts('Open file picker'))
 keymap.set('n', '<leader>b', ts.buffers, named_opts('Open buffer picker'))
-keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Open buffer picker'))
+keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Rename'))
 
 keymap.set('n', '<leader>d', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
 keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
 keymap.set('n', '<leader>/', ts.live_grep, named_opts('Search Workspace'))
+
+
+-- s for Show
+keymap.set('n', '<leader>sg', '<cmd>Gitsigns preview_hunk_inline<cr>', named_opts('Show diff'))
 
 keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 
@@ -112,21 +123,22 @@ keymap.set('n', 'gp', '<Cmd>bprevious<CR>', named_opts('Previous Buffer'))
 keymap.set('n', 'gl', '<Cmd>Lspsaga show_line_diagnostics<CR>', named_opts('Previous Buffer'))
 
 -- Forward / Back
-keymap.set("n", "[e", "<cmd>Lspsaga diagnostic_jump_prev<CR>", named_opts("Next Diagnostic"))
-keymap.set("n", "]e", "<cmd>Lspsaga diagnostic_jump_next<CR>", named_opts("Prev Diagnostic"))
+keymap.set("n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", named_opts("Next Diagnostic"))
+keymap.set("n", "]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", named_opts("Prev Diagnostic"))
 
 keymap.set("n", "] ", "o<esc>", named_opts("New line down"))
 keymap.set("n", "[ ", "O<esc>", named_opts("New line up"))
 keymap.set("n", "]g", "<cmd>Gitsigns next_hunk<cr>", named_opts("Next hunk"))
 keymap.set("n", "[g", "<cmd>Gitsigns prev_hunk<cr>", named_opts("Prev hunk"))
 
+-- Ctrl-V to paste from clipboard
 keymap.set("n", "<C-v>", '"+p', named_opts("Paste from clipboard"))
 keymap.set("v", "<C-v>", '"+p', named_opts("Paste from clipboard"))
 keymap.set("i", "<C-v>", '<esc>"+pi', named_opts("Paste from clipboard"))
 
 keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
 
-keymap.set("n", "<tab>", '<cmd>Gitsigns reset_hunk<CR>')
+keymap.set("n", "<tab>", vim.lsp.buf.formatting_sync, named_opts("Format buffer"))
 
 local Terminal = require('toggleterm.terminal').Terminal
 local lazygit  = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
@@ -140,10 +152,10 @@ vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>",
 
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
-local yank_group = augroup('HighlightYank', {})
+local default_autogroup = augroup('HighlightYank', {})
 
 autocmd('TextYankPost', {
-  group = yank_group,
+  group = default_autogroup,
   pattern = '*',
   callback = function()
     vim.highlight.on_yank({
@@ -153,4 +165,10 @@ autocmd('TextYankPost', {
   end,
 })
 
-vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()]]
+autocmd('BufWritePre', {
+  group = default_autogroup,
+  pattern = '*',
+  callback = function()
+    vim.lsp.buf.formatting_sync()
+  end
+})

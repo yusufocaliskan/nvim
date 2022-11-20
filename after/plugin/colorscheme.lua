@@ -4,5 +4,6 @@ if (not status) then return end
 ayu.setup {
   mirage = true,
 }
-vim.cmd [[ colorscheme gruvbox ]]
+vim.cmd [[ colorscheme ayu-mirage ]]
+vim.cmd [[ highlight Normal ctermbg=NONE guibg=NONE ]]
 

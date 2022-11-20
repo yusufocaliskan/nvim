@@ -8,7 +8,9 @@ vim.wo.number = true
 
 vim.opt.title = true
 vim.opt.autoindent = true
-vim.opt.hlsearch = true
+vim.opt.hlsearch = false
+vim.opt.hidden = true
+vim.opt.errorbells = false
 vim.opt.backup = false
 vim.opt.showcmd = true
 vim.opt.cmdheight = 1
@@ -17,8 +19,10 @@ vim.opt.expandtab = true
 vim.opt.scrolloff = 10
 vim.opt.shell = 'zsh'
 vim.opt.backupskip = '/tmp/*,/private/tmp/*'
+vim.opt.swapfile = false
 vim.opt.inccommand = 'split'
 vim.opt.ignorecase = true
+vim.opt.smartcase = true
 vim.opt.smarttab = true
 vim.opt.breakindent = true
 vim.opt.shiftwidth = 2
@@ -31,14 +35,11 @@ vim.opt.path:append { '**' } -- Finding files, search into subfolders
 vim.opt.wildignore:append { '*/node_modules/*', '*/target/*' }
 vim.opt.relativenumber = true
 vim.opt.termguicolors = true
+vim.opt.showmode = false
+vim.opt.cursorline = true
 
 vim.opt.timeoutlen = 40
 
-
-vim.api.nvim_create_autocmd("InsertLeave", {
-  pattern = '*',
-  command = "set nopaste"
-})
 -- Add asterisks in block comments
 vim.opt.formatoptions:append { 'r' }
 
