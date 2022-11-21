@@ -24,6 +24,7 @@ for type, icon in pairs(signs) do
 end
 
 saga.init_lsp_saga({
+  custom_kind = require("catppuccin.groups.integrations.lsp_saga").custom_kind(),
   border_style = "rounded",
   code_action_icon = "⌁",
   code_action_lightbulb = {
@@ -61,6 +62,11 @@ end
 local opts = { noremap = true, silent = true }
 local keymap = vim.keymap
 
+-- Vim Surround
+-- require("nvim-surround").setup({
+--
+-- })
+
 keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 
@@ -69,8 +75,9 @@ keymap.set('i', '<C-s>', '<esc>:w<CR>', opts)
 keymap.set('v', '<C-s>', '<esc>:w<CR>', opts)
 keymap.set('i', 'jk', '<esc>', opts)
 
-keymap.set('n', '<leader>p', '"_dP', named_opts('Paste preserving register'))
+keymap.set('n', '<leader>p', '"+p', named_opts('Paste from clipboard'))
 keymap.set('x', '<leader>p', '"_dP', named_opts('Paste preserving register'))
+keymap.set("i", "<C-v>", '<esc>"+pi', named_opts("Paste from clipboard"))
 
 -- leader yank to clipboard
 keymap.set('n', '<leader>y', '"+y', named_opts("Yank to clipboard"))
@@ -99,8 +106,9 @@ keymap.set('n', '<leader>d', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover
 keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
 keymap.set('n', '<leader>/', ts.live_grep, named_opts('Search Workspace'))
 
+keymap.set('n', 's', 'ys')
 
--- s for Show
+-- <leader>s for Show
 keymap.set('n', '<leader>sg', '<cmd>Gitsigns preview_hunk_inline<cr>', named_opts('Show diff'))
 
 keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
@@ -130,12 +138,6 @@ keymap.set("n", "] ", "o<esc>", named_opts("New line down"))
 keymap.set("n", "[ ", "O<esc>", named_opts("New line up"))
 keymap.set("n", "]g", "<cmd>Gitsigns next_hunk<cr>", named_opts("Next hunk"))
 keymap.set("n", "[g", "<cmd>Gitsigns prev_hunk<cr>", named_opts("Prev hunk"))
-
--- Ctrl-V to paste from clipboard
-keymap.set("n", "<C-v>", '"+p', named_opts("Paste from clipboard"))
-keymap.set("v", "<C-v>", '"+p', named_opts("Paste from clipboard"))
-keymap.set("i", "<C-v>", '<esc>"+pi', named_opts("Paste from clipboard"))
-
 keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
 
 keymap.set("n", "<tab>", vim.lsp.buf.formatting_sync, named_opts("Format buffer"))

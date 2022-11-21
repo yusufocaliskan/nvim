@@ -8,22 +8,28 @@ vim.cmd [[packadd packer.nvim]]
 
 packer.startup(function(use)
   use 'wbthomason/packer.nvim'
-  use  'hoob3rt/lualine.nvim' -- Statusline
+  use 'hoob3rt/lualine.nvim' -- Statusline
 
   use 'Shatur/neovim-ayu'
   use "ellisonleao/gruvbox.nvim"
+  use { "catppuccin/nvim", as = "catppuccin" }
 
   use 'folke/which-key.nvim'
   use 'windwp/nvim-autopairs'
+
+  use {
+    "kylechui/nvim-surround",
+    tag = "*", -- Use for stability; omit to use `main` branch for the latest features
+  }
 
   use { "nvim-telescope/telescope-file-browser.nvim" }
   use {
     'nvim-telescope/telescope.nvim', tag = '0.1.x',
     -- or                            , branch = '0.1.x',
-    requires = { {'nvim-lua/plenary.nvim'} }
+    requires = { { 'nvim-lua/plenary.nvim' } }
   }
 
-  use {"akinsho/toggleterm.nvim", tag = '*' }
+  use { "akinsho/toggleterm.nvim", tag = '*' }
 
   use {
     'nvim-tree/nvim-tree.lua',
