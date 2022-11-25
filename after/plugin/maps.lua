@@ -5,11 +5,15 @@ local ts = require('telescope.builtin')
 local telescope = require('telescope')
 local saga = require("lspsaga")
 
-require('nvim-autopairs').setup()
+require("mason").setup()
+
 require('toggleterm').setup({
   open_mapping = [[<c-\>]],
   direction = 'horizontal'
 })
+require('mini.pairs').setup()
+require('mini.comment').setup()
+require('mini.surround').setup()
 
 -- Gutter Symbols
 local signs = {
@@ -38,6 +42,13 @@ saga.init_lsp_saga({
   },
 })
 
+require("lsp_signature").setup({
+  bind = true, -- This is mandatory, otherwise border config won't get registered.
+  handler_opts = {
+    border = "rounded",
+  },
+  toggle_key = '<C-x>'
+})
 
 local filebrowser_actions = telescope.extensions.file_browser.actions
 telescope.setup {
@@ -61,11 +72,6 @@ end
 
 local opts = { noremap = true, silent = true }
 local keymap = vim.keymap
-
--- Vim Surround
--- require("nvim-surround").setup({
---
--- })
 
 keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
@@ -97,16 +103,15 @@ keymap.set('n', '-', '<C-x>', opts)
 
 keymap.set('n', '<leader>m', telescope.extensions.metals.commands, named_opts('Metals command picker'))
 keymap.set('n', '<leader>a', 'ggVG', named_opts('Select entire buffer'))
-keymap.set('n', '<leader>f', telescope.extensions.file_browser.file_browser, named_opts('Open file picker'))
+keymap.set('n', '<leader>f', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('Open file picker'))
 keymap.set('n', '<leader> ', ts.find_files, named_opts('Open file picker'))
 keymap.set('n', '<leader>b', ts.buffers, named_opts('Open buffer picker'))
 keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Rename'))
+keymap.set('n', '<leader>e', ts.lsp_dynamic_workspace_symbols, named_opts('LSP Workspace Symbols'))
 
 keymap.set('n', '<leader>d', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
 keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
 keymap.set('n', '<leader>/', ts.live_grep, named_opts('Search Workspace'))
-
-keymap.set('n', 's', 'ys')
 
 -- <leader>s for Show
 keymap.set('n', '<leader>sg', '<cmd>Gitsigns preview_hunk_inline<cr>', named_opts('Show diff'))
@@ -122,13 +127,23 @@ keymap.set('n', '<leader>1', '<Cmd>NvimTreeToggle<CR>', named_opts("Tree"))
 keymap.set('n', '<leader>q', '<cmd>q<cr>', named_opts('Quit window'))
 
 keymap.set('n', '<leader>cr', '<cmd>source<cr>', named_opts('Source current buffer'))
-keymap.set('n', '<leader>co', 'telescope.extensions.file_browser.', named_opts('Open config dir'))
+keymap.set('n', '<leader>co', '<cmd>Telescope file_browser path=~/.config/nvim<cr>', named_opts('Open config dir'))
 
 -- Goto
 keymap.set('n', 'gr', ts.lsp_references, named_opts('Find references'))
 keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
 keymap.set('n', 'gp', '<Cmd>bprevious<CR>', named_opts('Previous Buffer'))
 keymap.set('n', 'gl', '<Cmd>Lspsaga show_line_diagnostics<CR>', named_opts('Previous Buffer'))
+
+local harpoon_ui = require('harpoon.ui')
+local harpoon_mark = require('harpoon.mark')
+
+
+keymap.set('n', 'gm', harpoon_ui.toggle_quick_menu, named_opts('Harpoon UI'))
+keymap.set('n', 'ga', harpoon_mark.add_file, named_opts('Harpoon Add'))
+keymap.set('n', 'g1', function() harpoon_ui.nav_file(1) end, named_opts('Harpoon 1'))
+keymap.set('n', 'g2', function() harpoon_ui.nav_file(2) end, named_opts('Harpoon 2'))
+keymap.set('n', 'g3', function() harpoon_ui.nav_file(3) end, named_opts('Harpoon 3'))
 
 -- Forward / Back
 keymap.set("n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", named_opts("Next Diagnostic"))

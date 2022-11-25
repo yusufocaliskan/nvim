@@ -8,6 +8,7 @@ vim.cmd [[packadd packer.nvim]]
 
 packer.startup(function(use)
   use 'wbthomason/packer.nvim'
+  use "williamboman/mason.nvim"
   use 'hoob3rt/lualine.nvim' -- Statusline
 
   use 'Shatur/neovim-ayu'
@@ -15,12 +16,13 @@ packer.startup(function(use)
   use { "catppuccin/nvim", as = "catppuccin" }
 
   use 'folke/which-key.nvim'
-  use 'windwp/nvim-autopairs'
-
+  use 'echasnovski/mini.nvim'
   use {
     "kylechui/nvim-surround",
     tag = "*", -- Use for stability; omit to use `main` branch for the latest features
   }
+
+  use 'ThePrimeagen/harpoon'
 
   use { "nvim-telescope/telescope-file-browser.nvim" }
   use {
@@ -53,6 +55,7 @@ packer.startup(function(use)
     "glepnir/lspsaga.nvim",
     branch = "main",
   }
+  use 'ray-x/lsp_signature.nvim'
 
   -- Completion
   use {
