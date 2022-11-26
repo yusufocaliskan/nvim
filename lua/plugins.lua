@@ -48,6 +48,7 @@ packer.startup(function(use)
 
   -- LSP
   use 'neovim/nvim-lspconfig'
+  use 'lukas-reineke/lsp-format.nvim'
   -- LSP status indicator
   use 'j-hui/fidget.nvim'
 
