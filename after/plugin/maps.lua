@@ -56,6 +56,12 @@ require("lsp_signature").setup({
 
 local filebrowser_actions = telescope.extensions.file_browser.actions
 telescope.setup {
+  pickers = {
+    lsp_references = {
+      show_line = false,
+      fname_width = 60
+    }
+  },
   extensions = {
     file_browser = {
       hijack_netrw = true,
@@ -112,7 +118,7 @@ keymap.set('n', 'x', '"_x', opts)
 keymap.set('n', '+', '<C-a>', opts)
 keymap.set('n', '-', '<C-x>', opts)
 
-keymap.set('n', '<leader>m', telescope.extensions.metals.commands, named_opts('Metals command picker'))
+keymap.set('n', '<leader>M', telescope.extensions.metals.commands, named_opts('Metals command picker'))
 keymap.set('n', '<leader>f', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('Open file picker'))
 keymap.set('n', '<leader> ', ts.find_files, named_opts('Open file picker'))
 keymap.set('n', '<leader>b', ts.buffers, named_opts('Open buffer picker'))
@@ -126,8 +132,10 @@ keymap.set('n', '<leader>/', ts.live_grep, named_opts('Search Workspace'))
 
 -- <leader>s for Show
 keymap.set('n', '<leader>sg', '<cmd>Gitsigns preview_hunk_inline<cr>', named_opts('Show diff'))
+keymap.set('n', '<leader>sl', '<Cmd>Lspsaga show_line_diagnostics<CR>', named_opts('Line diagnostics'))
 
 keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
+keymap.set('n', '<C-w><cr>', "<cmd>only<cr>", named_opts('Close other windows'))
 
 -- Enter and Backspace for navigation
 keymap.set('n', '<cr>', "<cmd>Lspsaga lsp_finder<CR>", named_opts('Go to definition'))
@@ -141,20 +149,19 @@ keymap.set('n', '<leader>cr', '<cmd>source<cr>', named_opts('Source current buff
 keymap.set('n', '<leader>co', '<cmd>Telescope file_browser path=~/.config/nvim<cr>', named_opts('Open config dir'))
 
 -- Goto
+local harpoon_ui = require('harpoon.ui')
+local harpoon_mark = require('harpoon.mark')
 keymap.set('n', 'gr', ts.lsp_references, named_opts('Find references'))
 keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
 keymap.set('n', 'gp', '<Cmd>bprevious<CR>', named_opts('Previous Buffer'))
-keymap.set('n', 'gl', '<Cmd>Lspsaga show_line_diagnostics<CR>', named_opts('Previous Buffer'))
 
-local harpoon_ui = require('harpoon.ui')
-local harpoon_mark = require('harpoon.mark')
-
-
-keymap.set('n', 'gm', harpoon_ui.toggle_quick_menu, named_opts('Harpoon UI'))
-keymap.set('n', 'ga', harpoon_mark.add_file, named_opts('Harpoon Add'))
-keymap.set('n', 'g1', function() harpoon_ui.nav_file(1) end, named_opts('Harpoon 1'))
-keymap.set('n', 'g2', function() harpoon_ui.nav_file(2) end, named_opts('Harpoon 2'))
-keymap.set('n', 'g3', function() harpoon_ui.nav_file(3) end, named_opts('Harpoon 3'))
+-- <leader>m for 'mark'
+keymap.set('n', '<leader>ml', harpoon_ui.toggle_quick_menu, named_opts('Harpoon UI'))
+keymap.set('n', '<leader>ma', harpoon_mark.add_file, named_opts('Harpoon Add'))
+keymap.set('n', '<leader>m1', function() harpoon_ui.nav_file(1) end, named_opts('Harpoon 1'))
+keymap.set('n', '<leader>m2', function() harpoon_ui.nav_file(2) end, named_opts('Harpoon 2'))
+keymap.set('n', '<leader>m3', function() harpoon_ui.nav_file(3) end, named_opts('Harpoon 3'))
+keymap.set('n', '<leader>m4', function() harpoon_ui.nav_file(4) end, named_opts('Harpoon 3'))
 
 -- Forward / Back
 keymap.set("n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", named_opts("Next Diagnostic"))
@@ -171,11 +178,11 @@ keymap.set("n", "<tab>", vim.lsp.buf.format, named_opts("Format buffer"))
 local Terminal = require('toggleterm.terminal').Terminal
 local lazygit  = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
 
-function _lazygit_toggle()
+function Lazygit_Toggle()
   lazygit:toggle()
 end
 
-vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _lazygit_toggle()<CR>",
+vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua Lazygit_Toggle()<CR>",
   { noremap = true, silent = true, desc = "lazygit" })
 
 local augroup = vim.api.nvim_create_augroup
