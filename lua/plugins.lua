@@ -17,6 +17,7 @@ packer.startup(function(use)
 
   use 'folke/which-key.nvim'
   use 'echasnovski/mini.nvim'
+  use 'windwp/nvim-autopairs'
   use {
     "kylechui/nvim-surround",
     tag = "*", -- Use for stability; omit to use `main` branch for the latest features
@@ -57,6 +58,9 @@ packer.startup(function(use)
     branch = "main",
   }
   use 'ray-x/lsp_signature.nvim'
+
+  -- DAP
+  use 'mfussenegger/nvim-dap'
 
   -- Completion
   use {

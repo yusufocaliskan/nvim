@@ -11,9 +11,13 @@ require('toggleterm').setup({
   open_mapping = [[<c-\>]],
   direction = 'horizontal'
 })
-require('mini.pairs').setup()
-require('mini.comment').setup()
-require('mini.surround').setup()
+require("nvim-autopairs").setup({})
+require('mini.comment').setup({})
+require('mini.surround').setup({})
+require('mini.ai').setup({
+
+})
+require('mini.bufremove').setup({})
 
 -- Gutter Symbols
 local signs = {
@@ -79,6 +83,7 @@ keymap.set('i', '<C-j>', '<down>')
 keymap.set('i', '<C-k>', '<up>')
 keymap.set('i', '<C-l>', '<right>')
 
+-- Swap lines up and down
 keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 
@@ -92,6 +97,7 @@ keymap.set('x', '<leader>p', '"_dP', named_opts('Paste preserving register'))
 
 -- leader yank to clipboard
 keymap.set('n', '<leader>y', '"+y', named_opts("Yank to clipboard"))
+keymap.set('n', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
 keymap.set('v', '<leader>y', '"+y', named_opts("Yank to clipboard"))
 keymap.set('v', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
 
@@ -112,7 +118,7 @@ keymap.set('n', '<leader> ', ts.find_files, named_opts('Open file picker'))
 keymap.set('n', '<leader>b', ts.buffers, named_opts('Open buffer picker'))
 keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Rename'))
 keymap.set('n', '<leader>e', ts.lsp_dynamic_workspace_symbols, named_opts('LSP Workspace Symbols'))
-keymap.set('n', '<leader>x', ts.lsp_dynamic_workspace_symbols, named_opts('LSP Workspace Symbols'))
+keymap.set('n', '<leader>x', '<cmd>bdelete<cr>', named_opts('Close buffer'))
 
 keymap.set('n', '<leader>d', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
 keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
@@ -127,7 +133,7 @@ keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 keymap.set('n', '<cr>', "<cmd>Lspsaga lsp_finder<CR>", named_opts('Go to definition'))
 keymap.set('n', '<bs>', "<C-o>", named_opts('Go back'))
 
-keymap.set('n', '<leader>1', '<Cmd>NvimTreeToggle<CR>', named_opts("Tree"))
+keymap.set('n', '<leader>1', '<Cmd>NvimTreeFindFileToggle<CR>', named_opts("Tree"))
 
 keymap.set('n', '<leader>q', '<cmd>q<cr>', named_opts('Quit window'))
 
@@ -160,7 +166,7 @@ keymap.set("n", "]g", "<cmd>Gitsigns next_hunk<cr>", named_opts("Next hunk"))
 keymap.set("n", "[g", "<cmd>Gitsigns prev_hunk<cr>", named_opts("Prev hunk"))
 keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
 
-keymap.set("n", "<tab>", vim.lsp.buf.formatting_sync, named_opts("Format buffer"))
+keymap.set("n", "<tab>", vim.lsp.buf.format, named_opts("Format buffer"))
 
 local Terminal = require('toggleterm.terminal').Terminal
 local lazygit  = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
