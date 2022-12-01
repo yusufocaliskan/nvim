@@ -57,19 +57,21 @@ packer.startup(function(use)
     "glepnir/lspsaga.nvim",
     branch = "main",
   }
+  use 'folke/trouble.nvim'
   use 'ray-x/lsp_signature.nvim'
 
   -- DAP
   use 'mfussenegger/nvim-dap'
+  use 'rcarriga/nvim-dap-ui'
 
   -- Completion
   use {
     'hrsh7th/nvim-cmp',
     requires = {
+      'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip',
       'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-vsnip',
       'hrsh7th/cmp-buffer',
-      'hrsh7th/vim-vsnip',
       'hrsh7th/cmp-cmdline'
     }
   }
@@ -78,4 +80,12 @@ packer.startup(function(use)
     'scalameta/nvim-metals',
     requires = { "nvim-lua/plenary.nvim" }
   }
+
+  -- Important
+  use {
+    'tamton-aquib/duck.nvim'
+  }
+
 end)
+
+require('duck')

@@ -7,4 +7,4 @@ ayu.setup {
   mirage = true,
 }
 vim.cmd [[ colorscheme catppuccin ]]
-vim.cmd [[ highlight Normal ctermbg=NONE guibg=NONE ]]
+-- vim.cmd [[ highlight Normal ctermbg=NONE guibg=NONE ]]

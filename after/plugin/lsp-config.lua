@@ -1,3 +1,22 @@
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+require('lspconfig')['rust_analyzer'].setup {
+  -- Server-specific settings...
+  settings = {
+    ["rust-analyzer"] = {
+      -- enable clippy on save
+      checkOnSave = {
+        command = "clippy"
+      },
+    }
+  },
+  capabilities = capabilities
+}
+
+require('lspconfig')['tsserver'].setup {
+  capabilities = capabilities
+}
+
 require('lspconfig').sumneko_lua.setup {
   settings = {
     Lua = {
@@ -7,7 +26,7 @@ require('lspconfig').sumneko_lua.setup {
       },
       diagnostics = {
         -- Get the language server to recognize the `vim` global
-        globals = {'vim'},
+        globals = { 'vim' },
       },
       workspace = {
         -- Make the server aware of Neovim runtime files
@@ -19,4 +38,5 @@ require('lspconfig').sumneko_lua.setup {
       },
     },
   },
+  capabilities = capabilities
 }

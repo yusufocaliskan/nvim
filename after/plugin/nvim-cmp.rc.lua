@@ -5,8 +5,8 @@ cmp.setup({
   snippet = {
     -- REQUIRED - you must specify a snippet engine
     expand = function(args)
-      vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-      -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+      -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+      require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
       -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
       -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
     end,
@@ -26,8 +26,7 @@ cmp.setup({
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
     { name = 'path' },
-    { name = 'buffer' },
-    { name = 'vsnip' }, -- For vsnip users.
+    { name = 'luasnip' }, -- For vsnip users.
   })
 })
 
@@ -42,3 +41,6 @@ cmp.setup.cmdline(':', {
 })
 
 vim.opt.completeopt = menu, menuone, noselect
+
+vim.keymap.set('i', '<tab>', '<cmd>require("luasnip").jump(1)<cr>')
+vim.keymap.set('i', '<S-tab>', '<cmd>require("luasnip").jump(-1)<cr>')

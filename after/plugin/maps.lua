@@ -19,12 +19,15 @@ require('mini.ai').setup({
 })
 require('mini.bufremove').setup({})
 
+local dap = require("dap")
+require("dapui").setup()
+
 -- Gutter Symbols
 local signs = {
-  Error = "",
-  Warn = "",
-  Hint = "⌁",
-  Info = ""
+  Error = "E",
+  Warn = "W",
+  Hint = "H",
+  Info = "I"
 }
 for type, icon in pairs(signs) do
   local hl = "DiagnosticSign" .. type
@@ -34,6 +37,7 @@ end
 saga.init_lsp_saga({
   custom_kind = require("catppuccin.groups.integrations.lsp_saga").custom_kind(),
   border_style = "rounded",
+  saga_winblend = 30,
   code_action_icon = "⌁",
   code_action_lightbulb = {
     enable = true,
@@ -46,11 +50,36 @@ saga.init_lsp_saga({
   },
 })
 
+require("trouble").setup {
+  icons = false,
+  fold_open = "v", -- icon used for open folds
+  fold_closed = ">", -- icon used for closed folds
+  indent_lines = false, -- add an indent guide below the fold icons
+  auto_open = false,
+  auto_close = true,
+  signs = {
+    -- icons / text used for a diagnostic
+    error = "error",
+    warning = "warn",
+    hint = "hint",
+    information = "info"
+  },
+  use_diagnostic_signs = true -- enabling this will use the signs defined in your lsp client
+}
+vim.api.nvim_set_hl(0, 'TroubleTextError', vim.api.nvim_get_hl_by_name('DiagnosticError', true))
+vim.api.nvim_set_hl(0, 'TroubleTextWarning', vim.api.nvim_get_hl_by_name('DiagnosticWarn', true))
+vim.api.nvim_set_hl(0, 'TroubleTextHint', vim.api.nvim_get_hl_by_name('DiagnosticHint', true))
+
 require("lsp_signature").setup({
   bind = true, -- This is mandatory, otherwise border config won't get registered.
   handler_opts = {
     border = "rounded",
   },
+  always_trigger = true,
+  max_width = 120,
+  -- hi_parameter = "DiagnosticHint", -- Highlight group name to use for active param
+  hint_enable = false,
+  timer_interval = 50, -- default 200
   toggle_key = '<C-x>'
 })
 
@@ -60,6 +89,14 @@ telescope.setup {
     lsp_references = {
       show_line = false,
       fname_width = 60
+    }
+  },
+  defaults = {
+    file_ignore_patterns = { ".git/" },
+    layout_config = {
+      horizontal = {
+        prompt_position = "top"
+      }
     }
   },
   extensions = {
@@ -119,20 +156,26 @@ keymap.set('n', '+', '<C-a>', opts)
 keymap.set('n', '-', '<C-x>', opts)
 
 keymap.set('n', '<leader>M', telescope.extensions.metals.commands, named_opts('Metals command picker'))
-keymap.set('n', '<leader>f', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('Open file picker'))
-keymap.set('n', '<leader> ', ts.find_files, named_opts('Open file picker'))
-keymap.set('n', '<leader>b', ts.buffers, named_opts('Open buffer picker'))
+keymap.set('n', '<leader>f', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('Open file browser'))
+keymap.set('n', '<leader> ', '<cmd>Telescope find_files hidden=true<cr>', named_opts('Find file'))
 keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Rename'))
 keymap.set('n', '<leader>e', ts.lsp_dynamic_workspace_symbols, named_opts('LSP Workspace Symbols'))
-keymap.set('n', '<leader>x', '<cmd>bdelete<cr>', named_opts('Close buffer'))
+keymap.set('n', '<leader>k', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
 
-keymap.set('n', '<leader>d', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
 keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
 keymap.set('n', '<leader>/', ts.live_grep, named_opts('Search Workspace'))
 
 -- <leader>s for Show
 keymap.set('n', '<leader>sg', '<cmd>Gitsigns preview_hunk_inline<cr>', named_opts('Show diff'))
 keymap.set('n', '<leader>sl', '<Cmd>Lspsaga show_line_diagnostics<CR>', named_opts('Line diagnostics'))
+
+-- B for buffers
+keymap.set('n', '<leader>bd', '<cmd>bdelete<cr>', named_opts('Close buffer'))
+keymap.set('n', '<leader>bl', ts.buffers, named_opts('Open buffer picker'))
+
+-- d for debug
+keymap.set('n', '<leader>dc', dap.continue, named_opts('Go (continue)'))
+keymap.set('n', '<leader>dt', dap.repl.toggle, named_opts('Toggle debug repl'))
 
 keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 keymap.set('n', '<C-w><cr>', "<cmd>only<cr>", named_opts('Close other windows'))
@@ -145,12 +188,26 @@ keymap.set('n', '<leader>1', '<Cmd>NvimTreeFindFileToggle<CR>', named_opts("Tree
 
 keymap.set('n', '<leader>q', '<cmd>q<cr>', named_opts('Quit window'))
 
-keymap.set('n', '<leader>cr', '<cmd>source<cr>', named_opts('Source current buffer'))
-keymap.set('n', '<leader>co', '<cmd>Telescope file_browser path=~/.config/nvim<cr>', named_opts('Open config dir'))
+-- <leader>h for help
+function edit_neovim()
+  ts.find_files {
+    hidden = true,
+    cwd = "~/.config/nvim",
+    layout_strategy = 'horizontal',
+  }
+end
+
+keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('Open config dir'))
+keymap.set('n', '<leader>hr', '<cmd>source<cr>', named_opts('Source current buffer'))
+
+-- <leader>x for trouble
+keymap.set('n', '<leader>x', '<cmd>TroubleToggle workspace_diagnostics<cr>', named_opts('Workspace Diagnostics'))
 
 -- Goto
 local harpoon_ui = require('harpoon.ui')
 local harpoon_mark = require('harpoon.mark')
+local harpoon_tmux = require('harpoon.tmux')
+
 keymap.set('n', 'gr', ts.lsp_references, named_opts('Find references'))
 keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
 keymap.set('n', 'gp', '<Cmd>bprevious<CR>', named_opts('Previous Buffer'))
@@ -166,6 +223,12 @@ keymap.set('n', '<leader>m4', function() harpoon_ui.nav_file(4) end, named_opts(
 -- Forward / Back
 keymap.set("n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", named_opts("Next Diagnostic"))
 keymap.set("n", "]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", named_opts("Prev Diagnostic"))
+keymap.set("n", "[e", function()
+  require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR })
+end, { silent = true })
+keymap.set("n", "]e", function()
+  require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR })
+end, { silent = true })
 
 keymap.set("n", "] ", "o<esc>", named_opts("New line down"))
 keymap.set("n", "[ ", "O<esc>", named_opts("New line up"))
@@ -208,3 +271,6 @@ local on_attach = function(client)
   -- ... custom code ...
 end
 require("lspconfig").gopls.setup { on_attach = on_attach }
+
+keymap.set('n', '<leader>Dd', function() require("duck").hatch() end, named_opts("Make duck"))
+keymap.set('n', '<leader>Dk', function() require("duck").cook() end, named_opts("Kill duck"))
