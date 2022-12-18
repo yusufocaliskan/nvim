@@ -40,6 +40,11 @@ packer.startup(function(use)
   }
 
   use { 'nvim-treesitter/nvim-treesitter' }
+  use { -- additional text objects via treesitter
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    after = 'nvim-treesitter',
+  }
+  use { 'nvim-treesitter/playground' }
 
   use {
     'lewis6991/gitsigns.nvim'
@@ -52,12 +57,14 @@ packer.startup(function(use)
   use 'lukas-reineke/lsp-format.nvim'
   -- LSP status indicator
   use 'j-hui/fidget.nvim'
+  use 'lvimuser/lsp-inlayhints.nvim'
+
+  use 'rrethy/vim-illuminate'
 
   use {
     "glepnir/lspsaga.nvim",
     branch = "main",
   }
-  use 'folke/trouble.nvim'
   use 'ray-x/lsp_signature.nvim'
 
   -- DAP
@@ -81,11 +88,15 @@ packer.startup(function(use)
     requires = { "nvim-lua/plenary.nvim" }
   }
 
-  -- Important
+  -- Typescript
+  use 'jose-elias-alvarez/typescript.nvim'
+  use {
+    'jose-elias-alvarez/null-ls.nvim'
+  }
+
+  -- important
   use {
     'tamton-aquib/duck.nvim'
   }
 
 end)
-
-require('duck')

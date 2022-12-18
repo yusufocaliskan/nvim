@@ -1,9 +1,9 @@
 local status, lualine = pcall(require, 'lualine')
 if (not status) then return end
 
-function metals_status()
+function MetalsStatus()
   local ms = vim.g['metals_status']
-  if ms == 'nil' then return ''
+  if ms == nil then return ''
   else return ms end
 end
 
@@ -27,12 +27,12 @@ lualine.setup {
     }
   },
   sections = {
-    lualine_a = { 'mode' },
-    lualine_b = { 'branch', 'diff', 'diagnostics' },
-    lualine_c = { 'filename' },
-    lualine_x = { metals_status, 'filetype' },
-    lualine_y = { 'progress' },
-    lualine_z = { 'location' }
+    lualine_a = { 'filename', 'branch' },
+    lualine_b = { 'diagnostics' },
+    lualine_c = {  },
+    lualine_x = { MetalsStatus, 'filetype' },
+    lualine_y = { 'searchcount' },
+    lualine_z = { 'progress', 'location' }
   },
   inactive_sections = {
     lualine_a = {},

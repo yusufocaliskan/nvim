@@ -9,13 +9,20 @@ vim.opt.termguicolors = true
 
 -- empty setup using defaults
 require("nvim-tree").setup({
+  diagnostics = {
+    enable = true,
+    severity = {
+      min = vim.diagnostic.severity.ERROR,
+      max = vim.diagnostic.severity.ERROR
+    }
+  },
   renderer = {
     icons = {
       show = {
-         file = false,
-         folder = false,
-         folder_arrow = false,
-         git = true
+        file = false,
+        folder = false,
+        folder_arrow = false,
+        git = true
       }
     }
   }

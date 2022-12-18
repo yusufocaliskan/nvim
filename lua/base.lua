@@ -39,6 +39,7 @@ vim.opt.showmode = false
 vim.opt.cursorline = true
 
 vim.opt.timeoutlen = 100
+vim.opt.updatetime = 50
 
 -- Add asterisks in block comments
 vim.opt.formatoptions:append { 'r' }
