@@ -1,5 +1,7 @@
 local cmp = require('cmp')
 local compare = require('cmp.config.compare')
+local luasnip = require('luasnip')
+
 cmp.setup({
   snippet = {
     -- REQUIRED - you must specify a snippet engine
@@ -22,10 +24,31 @@ cmp.setup({
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.abort(),
     -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    ['<cr>'] = cmp.mapping.confirm({ select = true }),
+    ['<cr>'] = cmp.mapping.confirm({
+      select = true,
+      behavior = cmp.ConfirmBehavior.Replace
+    }),
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { 'i', 's' })
   }),
   sources = cmp.config.sources({
-    { 
+    {
       name = 'nvim_lsp',
       -- keyword_length = 2,
       max_item_count = 30,
@@ -62,10 +85,10 @@ cmp.setup({
 cmp.setup.cmdline('/', {
   mapping = cmp.mapping.preset.cmdline(),
   sources = {
+    { name = 'nvim_lsp' },
     { name = 'buffer' }
   }
 })
-
 -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline(':', {
   mapping = cmp.mapping.preset.cmdline(),
@@ -77,8 +100,3 @@ cmp.setup.cmdline(':', {
 })
 
 vim.opt.completeopt = menu, menuone, noselect
-
-vim.keymap.set('i', '<tab>', '<cmd>lua require("luasnip").jump(1)<cr>')
-vim.keymap.set('i', '<S-tab>', '<cmd>lua require("luasnip").jump(-1)<cr>')
-vim.keymap.set('s', '<tab>', '<cmd>lua require("luasnip").jump(1)<cr>')
-vim.keymap.set('s', '<S-tab>', '<cmd>lua require("luasnip").jump(-1)<cr>')

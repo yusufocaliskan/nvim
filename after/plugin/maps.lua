@@ -1,8 +1,34 @@
 vim.g.mapleader = ' '
 require('which-key')
 -- Telescope
-local telescope = require('telescope')
-local saga = require("lspsaga")
+require('telescope').setup {
+  pickers = {
+    lsp_references = {
+      show_line = false,
+      fname_width = 60
+    }
+  },
+  defaults = {
+    file_ignore_patterns = { ".git/" },
+    layout_config = {
+      horizontal = {
+        prompt_position = "top"
+      }
+    }
+  },
+  extensions = {
+    file_browser = {
+      hijack_netrw = true,
+      -- mappings = {
+      --   ["i"] = {
+      --     -- remap to going to home directory
+      --     ["<C-CR>"] = filebrowser_actions.create_from_prompt
+      --   },
+      -- }
+    }
+  }
+}
+
 
 require("mason").setup()
 
@@ -35,63 +61,7 @@ for type, icon in pairs(signs) do
   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
 
-saga.init_lsp_saga({
-  custom_kind = require("catppuccin.groups.integrations.lsp_saga").custom_kind(),
-  border_style = "rounded",
-  code_action_icon = "⌁",
-  code_action_lightbulb = {
-    enable = true,
-    enable_in_insert = false,
-    cache_code_action = true,
-    sign = true,
-    update_time = 150,
-    sign_priority = 20,
-    virtual_text = true,
-  },
-})
-
-require("lsp_signature").setup({
-  bind = true, -- This is mandatory, otherwise border config won't get registered.
-  handler_opts = {
-    border = "rounded",
-  },
-  max_width = 120,
-  max_height = 30,
-  doc_lines = 20,
-  wrap = true,
-  -- hi_parameter = "DiagnosticHint", -- Highlight group name to use for active param
-  hint_enable = false,
-  toggle_key = '<C-x>'
-})
-
-telescope.setup {
-  pickers = {
-    lsp_references = {
-      show_line = false,
-      fname_width = 60
-    }
-  },
-  defaults = {
-    file_ignore_patterns = { ".git/" },
-    layout_config = {
-      horizontal = {
-        prompt_position = "top"
-      }
-    }
-  },
-  extensions = {
-    file_browser = {
-      hijack_netrw = true,
-      -- mappings = {
-      --   ["i"] = {
-      --     -- remap to going to home directory
-      --     ["<C-CR>"] = filebrowser_actions.create_from_prompt
-      --   },
-      -- }
-    }
-  }
-}
-telescope.load_extension("file_browser")
+require('telescope').load_extension("file_browser")
 
 local function named_opts(desc)
   return { noremap = true, silent = true, desc = desc }
@@ -168,31 +138,17 @@ keymap.set('n', 'x', '"_x', opts)
 keymap.set('n', '+', '<C-a>', opts)
 keymap.set('n', '-', '<C-x>', opts)
 
-keymap.set('n', '<leader>M', telescope.extensions.metals.commands, named_opts('Metals command picker'))
+keymap.set('n', '<leader>M', require('telescope').extensions.metals.commands, named_opts('Metals command picker'))
 keymap.set('n', '<leader>f', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('Open file browser'))
 keymap.set('n', '<leader> ', '<cmd>Telescope find_files hidden=true<cr>', named_opts('Find file'))
+keymap.set('n', '<leader>/', require('telescope.builtin').live_grep, named_opts('Grep Workspace'))
+function ts_grep_from_dir()
+  local buf_dir = require('telescope.utils').buffer_dir()
+  require('telescope.builtin').live_grep({ cwd = buf_dir })
+end
+
 keymap.set('n', '<leader>/', require('telescope.builtin').live_grep, named_opts('Search Workspace'))
 
--- LSP
-keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Rename'))
-keymap.set('n', '<leader>e', require('telescope.builtin').lsp_dynamic_workspace_symbols,
-  named_opts('LSP Workspace Symbols'))
-keymap.set('n', '<leader>k', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
-keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
-keymap.set('n', 'gi', vim.lsp.buf.implementation, named_opts('[G]o [I]mplementation'))
-keymap.set('n', 'gr', require('telescope.builtin').lsp_references, named_opts('Find references'))
-keymap.set("n", "[d", vim.diagnostic.goto_next, named_opts("Next Diagnostic"))
-keymap.set("n", "]d", vim.diagnostic.goto_prev, named_opts("Prev Diagnostic"))
-keymap.set("n", "[e", function()
-  require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR })
-end, { silent = true })
-keymap.set("n", "]e", function()
-  require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR })
-end, { silent = true })
-keymap.set("n", "<tab>", vim.lsp.buf.format, named_opts("Format buffer"))
--- Enter and Backspace for navigation
--- TODO: this is messing up qflist and loclist
-keymap.set('n', '<cr>', vim.lsp.buf.definition, named_opts('Go to definition'))
 keymap.set('n', '<bs>', "<C-o>", named_opts('Go back'))
 
 -- <leader>s for Show
@@ -200,9 +156,8 @@ keymap.set('n', '<leader>sg', '<cmd>Gitsigns preview_hunk_inline<cr>', named_opt
 keymap.set('n', '<leader>sb', '<Cmd>Gitsigns toggle_current_line_blame<CR>', named_opts('Blame'))
 keymap.set('n', '<leader>sl', vim.diagnostic.open_float, named_opts('Line diagnostics'))
 
--- B for buffers
-keymap.set('n', '<leader>bd', '<cmd>bdelete<cr>', named_opts('Close buffer'))
-keymap.set('n', '<leader>bl', require('telescope.builtin').buffers, named_opts('Open buffer picker'))
+keymap.set('n', '<leader>bd', '<cmd>b#|bd#<cr>', named_opts('Close buffer'))
+keymap.set('n', '<leader><tab>', require('telescope.builtin').buffers, named_opts('Open buffer picker'))
 
 -- d for debug
 keymap.set('n', '<leader>dc', dap.continue, named_opts('Go (continue)'))
@@ -212,8 +167,6 @@ keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 keymap.set('n', '<C-w><cr>', "<cmd>only<cr>", named_opts('Close other windows'))
 
 keymap.set('n', '<leader>1', '<Cmd>NvimTreeFindFileToggle<CR>', named_opts("Tree"))
-
-keymap.set('n', '<leader>q', '<cmd>q<cr>', named_opts('Quit window'))
 
 -- <leader>h for help
 function edit_neovim()
@@ -228,7 +181,9 @@ keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('Open con
 keymap.set('n', '<leader>hr', '<cmd>source<cr>', named_opts('Source current buffer'))
 keymap.set('n', '<leader>htc', colemak_toggle, named_opts('Toggle -> Colemak'))
 
-keymap.set('n', '<leader>x', require('telescope.builtin').diagnostics, named_opts('Workspace Diagnostics'))
+-- P(vim.diagnostic.severity)
+keymap.set('n', '<leader>x', function() require('telescope.builtin').diagnostics({ severity_limit = 'WARN' }) end,
+  named_opts('Workspace Diagnostics'))
 
 -- Goto
 local harpoon_ui = require('harpoon.ui')
@@ -236,7 +191,7 @@ local harpoon_mark = require('harpoon.mark')
 local harpoon_tmux = require('harpoon.tmux')
 
 keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
-keymap.set('n', 'gp', '<Cmd>bprevious<CR>', named_opts('Previous Buffer'))
+keymap.set('n', 'gp', '<Cmd>b#<CR>', named_opts('Previous Buffer'))
 
 -- <leader>m for 'mark'
 keymap.set('n', 'gl', harpoon_ui.toggle_quick_menu, named_opts('Harpoon UI'))
@@ -252,6 +207,7 @@ keymap.set("n", "[ ", "O<esc>", named_opts("New line up"))
 keymap.set("n", "]g", "<cmd>Gitsigns next_hunk<cr>", named_opts("Next hunk"))
 keymap.set("n", "[g", "<cmd>Gitsigns prev_hunk<cr>", named_opts("Prev hunk"))
 keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
+keymap.set("n", "<leader>?", require('telescope.builtin').command_history, named_opts("Command history"))
 
 local Terminal = require('toggleterm.terminal').Terminal
 local lazygit  = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
@@ -277,14 +233,6 @@ autocmd('TextYankPost', {
     })
   end,
 })
-
---Format async on Save
-require("lsp-format").setup()
-local on_attach = function(client)
-  require("lsp-format").on_attach(client)
-
-  -- ... custom code ...
-end
 
 -- Important
 require("duck").setup {

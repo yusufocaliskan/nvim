@@ -32,6 +32,7 @@ dap.configurations.scala = {
 
 metals_config.on_attach = function(client, bufnr)
   require("metals").setup_dap()
+  on_attach(client)
 end
 
 -- Autocmd that will actually be in charging of starting the whole thing

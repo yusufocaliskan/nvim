@@ -1,15 +1,74 @@
+on_attach = function(client, bufnr)
+  require("lsp-format").on_attach(client)
+
+  local function named_opts(desc)
+    return { noremap = true, silent = true, desc = desc, buffer = bufnr }
+  end
+
+  -- LSP
+  vim.keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Rename'))
+  vim.keymap.set('n', '<leader>e', require('telescope.builtin').lsp_dynamic_workspace_symbols,
+    named_opts('LSP Workspace Symbols'))
+  vim.keymap.set('n', '<leader>k', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
+  vim.keymap.set('n', '<leader>.', "<cmd>Lspsaga code_action<CR>", named_opts('Code Action'))
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, named_opts('[G]o [I]mplementation'))
+  vim.keymap.set('n', 'gr', require('telescope.builtin').lsp_references, named_opts('Find references'))
+  vim.keymap.set("n", "[d", vim.diagnostic.goto_next, named_opts("Next Diagnostic"))
+  vim.keymap.set("n", "]d", vim.diagnostic.goto_prev, named_opts("Prev Diagnostic"))
+  vim.keymap.set("n", "[e", function()
+    require("lspsaga.diagnostic").goto_prev({ severity = vim.diagnostic.severity.ERROR })
+  end, named_opts("Next [E]rror"))
+  vim.keymap.set("n", "]e", function()
+    require("lspsaga.diagnostic").goto_next({ severity = vim.diagnostic.severity.ERROR })
+  end, named_opts("Previous [E]rror"))
+  vim.keymap.set("n", "<tab>", vim.lsp.buf.format, named_opts("Format buffer"))
+  -- Enter and Backspace for navigation
+  -- TODO: this is messing up qflist and loclist
+  vim.keymap.set('n', '<cr>', vim.lsp.buf.definition, named_opts('Go to definition'))
+  -- ... custom code ...
+end
+
+require("lspsaga").init_lsp_saga({
+  custom_kind = require("catppuccin.groups.integrations.lsp_saga").custom_kind(),
+  border_style = "rounded",
+  code_action_icon = "⌁",
+  code_action_lightbulb = {
+    enable = true,
+    enable_in_insert = false,
+    cache_code_action = true,
+    sign = true,
+    update_time = 150,
+    sign_priority = 20,
+    virtual_text = true,
+  },
+})
+
+require("lsp_signature").setup({
+  bind = true, -- This is mandatory, otherwise border config won't get registered.
+  handler_opts = {
+    border = "rounded",
+  },
+  max_width = 120,
+  max_height = 30,
+  doc_lines = 20,
+  wrap = true,
+  -- hi_parameter = "DiagnosticHint", -- Highlight group name to use for active param
+  hint_enable = false,
+  toggle_key = '<C-x>'
+})
+
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
- vim.lsp.diagnostic.on_publish_diagnostics, {
-   -- Enable underline, use default values
-   underline = false,
-   -- Enable virtual text only on Warning or above, override spacing to 2
-   virtual_text = {
-     spacing = 2,
-     severity_limit = "Warning",
-   },
- }
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+  -- Enable underline, use default values
+  underline = false,
+  -- Enable virtual text only on Warning or above, override spacing to 2
+  virtual_text = {
+    spacing = 2,
+    severity_limit = "Warning",
+  },
+}
 )
 
 require('lspconfig')['rust_analyzer'].setup {
@@ -30,7 +89,8 @@ require('lspconfig')['rust_analyzer'].setup {
       },
     }
   },
-  capabilities = capabilities
+  capabilities = capabilities,
+  on_attach = on_attach
 }
 require("lsp-inlayhints").setup()
 --
@@ -64,7 +124,8 @@ require("typescript").setup({
     fallback = true, -- fall back to standard LSP definition on failure
   },
   server = { -- pass options to lspconfig's setup method
-    capabilities = capabilities
+    capabilities = capabilities,
+    on_attach = on_attach
   },
 })
 
@@ -90,11 +151,13 @@ require('lspconfig').sumneko_lua.setup {
       },
     },
   },
-  capabilities = capabilities
+  capabilities = capabilities,
+  on_attach = on_attach
 }
 
 require('lspconfig').terraformls.setup {
 
 }
 
-
+--Format async on Save
+require("lsp-format").setup()
