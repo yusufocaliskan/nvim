@@ -139,8 +139,8 @@ keymap.set('n', '+', '<C-a>', opts)
 keymap.set('n', '-', '<C-x>', opts)
 
 keymap.set('n', '<leader>M', require('telescope').extensions.metals.commands, named_opts('Metals command picker'))
-keymap.set('n', '<leader>f', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('Open file browser'))
-keymap.set('n', '<leader> ', '<cmd>Telescope find_files hidden=true<cr>', named_opts('Find file'))
+keymap.set('n', '<leader>F', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('Open file browser'))
+keymap.set('n', '<leader>f', '<cmd>Telescope find_files hidden=true<cr>', named_opts('Find file'))
 keymap.set('n', '<leader>/', require('telescope.builtin').live_grep, named_opts('Grep Workspace'))
 function ts_grep_from_dir()
   local buf_dir = require('telescope.utils').buffer_dir()
@@ -182,7 +182,9 @@ keymap.set('n', '<leader>hr', '<cmd>source<cr>', named_opts('Source current buff
 keymap.set('n', '<leader>htc', colemak_toggle, named_opts('Toggle -> Colemak'))
 
 -- P(vim.diagnostic.severity)
-keymap.set('n', '<leader>x', function() require('telescope.builtin').diagnostics({ severity_limit = 'WARN' }) end,
+keymap.set('n', '<leader>d', function()
+  require('telescope.builtin').diagnostics({ severity_limit = 'WARN' })
+end,
   named_opts('Workspace Diagnostics'))
 
 -- Goto
@@ -191,7 +193,7 @@ local harpoon_mark = require('harpoon.mark')
 local harpoon_tmux = require('harpoon.tmux')
 
 keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
-keymap.set('n', 'gp', '<Cmd>b#<CR>', named_opts('Previous Buffer'))
+keymap.set('n', 'gp', '<Cmd>bprev<CR>', named_opts('Previous Buffer'))
 
 -- <leader>m for 'mark'
 keymap.set('n', 'gl', harpoon_ui.toggle_quick_menu, named_opts('Harpoon UI'))

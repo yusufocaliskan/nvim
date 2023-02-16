@@ -28,21 +28,6 @@ on_attach = function(client, bufnr)
   -- ... custom code ...
 end
 
-require("lspsaga").init_lsp_saga({
-  custom_kind = require("catppuccin.groups.integrations.lsp_saga").custom_kind(),
-  border_style = "rounded",
-  code_action_icon = "⌁",
-  code_action_lightbulb = {
-    enable = true,
-    enable_in_insert = false,
-    cache_code_action = true,
-    sign = true,
-    update_time = 150,
-    sign_priority = 20,
-    virtual_text = true,
-  },
-})
-
 require("lsp_signature").setup({
   bind = true, -- This is mandatory, otherwise border config won't get registered.
   handler_opts = {
@@ -56,6 +41,14 @@ require("lsp_signature").setup({
   hint_enable = false,
   toggle_key = '<C-x>'
 })
+
+require("illuminate").configure {
+  delay = 50,
+  filetypes_denylist = {
+    'NvimTree', 'TelescopePrompt'
+  },
+
+}
 
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
@@ -130,7 +123,7 @@ require("typescript").setup({
 })
 
 
-require('lspconfig').sumneko_lua.setup {
+require('lspconfig').lua_ls.setup {
   settings = {
     Lua = {
       runtime = {

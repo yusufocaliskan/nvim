@@ -6,9 +6,9 @@ require("catppuccin")
 -- vim.cmd [[ hi! link IlluminatedWordText Search ]]
 -- vim.cmd [[ hi! link IlluminatedWordRead Search ]]
 -- vim.cmd [[ hi! link IlluminatedWordWrite guibg=#6c7086 ]]
-vim.cmd [[ hi! IlluminatedWordText  guibg=#38384d gui=bold]]
-vim.cmd [[ hi! IlluminatedWordRead  guibg=#38384d gui=bold]]
-vim.cmd [[ hi! IlluminatedWordWrite guibg=#38384d gui=bold]]
+vim.cmd [[ hi! IlluminatedWordText  guibg=#38384d gui=NONE]]
+vim.cmd [[ hi! IlluminatedWordRead  guibg=#38384d gui=NONE]]
+vim.cmd [[ hi! IlluminatedWordWrite guibg=#38384d gui=NONE]]
 
 -- require('ayu')
 -- ayu.setup {

@@ -23,6 +23,8 @@ packer.startup(function(use)
     tag = "*", -- Use for stability; omit to use `main` branch for the latest features
   }
 
+  use { 'akinsho/bufferline.nvim', tag = "v3.*", requires = 'nvim-tree/nvim-web-devicons' }
+
   use 'ThePrimeagen/harpoon'
 
   use { "nvim-telescope/telescope-file-browser.nvim" }
@@ -98,5 +100,4 @@ packer.startup(function(use)
   use {
     'tamton-aquib/duck.nvim'
   }
-
 end)
