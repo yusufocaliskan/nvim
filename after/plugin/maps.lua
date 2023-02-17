@@ -159,8 +159,8 @@ keymap.set('n', '<leader>bd', '<cmd>b#|bd#<cr>', named_opts('Close buffer'))
 keymap.set('n', '<leader><tab>', require('telescope.builtin').buffers, named_opts('Open buffer picker'))
 
 -- d for debug
-keymap.set('n', '<leader>dc', dap.continue, named_opts('Go (continue)'))
-keymap.set('n', '<leader>dt', dap.repl.toggle, named_opts('Toggle debug repl'))
+keymap.set('n', '<leader>Dc', dap.continue, named_opts('Go (continue)'))
+keymap.set('n', '<leader>Dt', dap.repl.toggle, named_opts('Toggle debug repl'))
 
 keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 keymap.set('n', '<C-w><cr>', "<cmd>only<cr>", named_opts('Close other windows'))
@@ -180,16 +180,9 @@ keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('Open con
 keymap.set('n', '<leader>hr', '<cmd>source<cr>', named_opts('Source current buffer'))
 keymap.set('n', '<leader>htc', colemak_toggle, named_opts('Toggle -> Colemak'))
 
--- P(vim.diagnostic.severity)
-keymap.set('n', '<leader>d', function()
-  require('telescope.builtin').diagnostics({ severity_limit = 'WARN' })
-end,
-  named_opts('Workspace Diagnostics'))
-
 -- Goto
 local harpoon_ui = require('harpoon.ui')
 local harpoon_mark = require('harpoon.mark')
-local harpoon_tmux = require('harpoon.tmux')
 
 keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
 keymap.set('n', 'gp', '<Cmd>bprev<CR>', named_opts('Previous Buffer'))

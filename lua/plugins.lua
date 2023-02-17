@@ -51,7 +51,6 @@ packer.startup(function(use)
     -- tag = 'release' -- To use the latest release (do not use this if you run Neovim nightly or dev builds!)
   }
 
-
   -- LSP
   use 'neovim/nvim-lspconfig'
   use 'lukas-reineke/lsp-format.nvim'
@@ -60,6 +59,16 @@ packer.startup(function(use)
   use 'lvimuser/lsp-inlayhints.nvim'
 
   use 'rrethy/vim-illuminate'
+  -- Lua
+  use {
+    "folke/trouble.nvim",
+    requires = "nvim-tree/nvim-web-devicons",
+    config = function()
+      require("trouble").setup {
+        auto_preview = false, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
+      }
+    end
+  }
 
   use {
     "glepnir/lspsaga.nvim",
