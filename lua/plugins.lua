@@ -11,8 +11,6 @@ packer.startup(function(use)
   use "williamboman/mason.nvim"
   use 'hoob3rt/lualine.nvim' -- Statusline
 
-  use 'Shatur/neovim-ayu'
-  use "ellisonleao/gruvbox.nvim"
   use { "catppuccin/nvim", as = "catppuccin" }
 
   use 'folke/which-key.nvim'

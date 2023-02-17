@@ -3,8 +3,11 @@ if (not status) then return end
 
 function MetalsStatus()
   local ms = vim.g['metals_status']
-  if ms == nil then return ''
-  else return ms end
+  if ms == nil then
+    return ''
+  else
+    return ms
+  end
 end
 
 lualine.setup {
@@ -27,9 +30,9 @@ lualine.setup {
     }
   },
   sections = {
-    lualine_a = { 'filename', 'branch' },
-    lualine_b = { 'diagnostics' },
-    lualine_c = {  },
+    lualine_a = { 'branch' },
+    lualine_b = { 'filename', 'diagnostics' },
+    lualine_c = {},
     lualine_x = { MetalsStatus, 'filetype' },
     lualine_y = { 'searchcount' },
     lualine_z = { 'progress', 'location' }

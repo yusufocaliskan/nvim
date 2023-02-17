@@ -1,5 +1,4 @@
 vim.g.mapleader = ' '
-require('which-key')
 -- Telescope
 require('telescope').setup {
   pickers = {

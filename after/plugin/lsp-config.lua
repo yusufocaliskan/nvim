@@ -43,7 +43,7 @@ require("lsp_signature").setup({
 })
 
 require("illuminate").configure {
-  delay = 50,
+  delay = 0,
   filetypes_denylist = {
     'NvimTree', 'TelescopePrompt'
   },
