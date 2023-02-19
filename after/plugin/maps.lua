@@ -8,7 +8,7 @@ require('telescope').setup {
     }
   },
   defaults = {
-    file_ignore_patterns = { ".git/" },
+    file_ignore_patterns = { ".git/", "node_modules/" },
     layout_config = {
       horizontal = {
         prompt_position = "top"
@@ -107,6 +107,7 @@ keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 
 keymap.set("n", "<leader>sub", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+keymap.set("x", "<leader>ss", [[:%s/\%V\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
 keymap.set('n', '<C-s>', ':w<CR>', opts)
 keymap.set('i', '<C-s>', '<esc>:w<CR>', opts)
@@ -125,24 +126,23 @@ keymap.set('v', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
 keymap.set('n', '<C-d>', '<C-d>zz', named_opts("Page down (centered)"))
 keymap.set('n', '<C-u>', '<C-u>zz', named_opts("Page up (centered)"))
 
-keymap.set('n', '<C-J>', "<cmd>cnext<cr>")
-keymap.set('n', '<C-K>', "<cmd>cprev<cr>")
-
 -- Do not yank with x
 keymap.set('n', 'x', '"_x', opts)
 
--- Increment/decrement
-keymap.set('n', '+', '<C-a>', opts)
-keymap.set('n', '-', '<C-x>', opts)
+function ts_grep_from_dir(dir)
+  require('telescope.builtin').live_grep({ cwd = dir })
+end
+
+function ts_grep_from_buffer_dir()
+  local buf_dir = require('telescope.utils').buffer_dir()
+  ts_grep_from_dir(buf_dir)
+end
 
 keymap.set('n', '<leader>M', require('telescope').extensions.metals.commands, named_opts('Metals command picker'))
-keymap.set('n', '<leader>F', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('Open file browser'))
-keymap.set('n', '<leader>f', '<cmd>Telescope find_files hidden=true<cr>', named_opts('Find file'))
+keymap.set('n', '<leader>F', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('[F]ile browser at buffer dir'))
+keymap.set('n', '<leader>f', '<cmd>Telescope find_files hidden=true<cr>', named_opts('[F]ind [f]ile'))
 keymap.set('n', '<leader>/', require('telescope.builtin').live_grep, named_opts('Grep Workspace'))
-function ts_grep_from_dir()
-  local buf_dir = require('telescope.utils').buffer_dir()
-  require('telescope.builtin').live_grep({ cwd = buf_dir })
-end
+keymap.set('n', '<leader>*', ts_grep_from_buffer_dir, named_opts('Grep Workspace'))
 
 keymap.set('n', '<leader>/', require('telescope.builtin').live_grep, named_opts('Search Workspace'))
 
@@ -153,7 +153,7 @@ keymap.set('n', '<leader>sg', '<cmd>Gitsigns preview_hunk_inline<cr>', named_opt
 keymap.set('n', '<leader>sb', '<Cmd>Gitsigns toggle_current_line_blame<CR>', named_opts('Blame'))
 keymap.set('n', '<leader>sl', vim.diagnostic.open_float, named_opts('Line diagnostics'))
 
-keymap.set('n', '<leader>bd', '<cmd>b#|bd#<cr>', named_opts('Close buffer'))
+keymap.set('n', '<leader>x', MiniBufremove.delete, named_opts('Close buffer'))
 keymap.set('n', '<leader><tab>', require('telescope.builtin').buffers, named_opts('Open buffer picker'))
 
 -- d for debug
@@ -174,8 +174,9 @@ function edit_neovim()
   }
 end
 
-keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('Open config dir'))
+keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('[O]pen config dir'))
 keymap.set('n', '<leader>hr', '<cmd>source<cr>', named_opts('Source current buffer'))
+keymap.set('n', '<leader>h/', function() ts_grep_from_dir('~/.config/nvim') end, named_opts('Grep config dir'))
 keymap.set('n', '<leader>htc', colemak_toggle, named_opts('Toggle -> Colemak'))
 
 -- Goto
@@ -234,4 +235,4 @@ require("duck").setup {
   width = 2
 }
 
-keymap.set('n', '<leader>Dk', function() require("duck").cook('🎄') end, named_opts("Kill tree"))
+keymap.set('n', '<leader>Dk', function() require("duck").cook() end, named_opts("Kill tree"))
