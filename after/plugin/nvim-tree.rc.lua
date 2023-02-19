@@ -10,7 +10,17 @@ vim.opt.termguicolors = true
 -- empty setup using defaults
 require("nvim-tree").setup({
   view = {
+    float = {
+      enable = false,
+      open_win_config = {
+        width = 50,
+        height = 50,
+      },
+    },
     signcolumn = "yes",
+  },
+  update_focused_file = {
+    enable = true,
   },
   git = {
     show_on_dirs = false,

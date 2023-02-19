@@ -12,17 +12,19 @@ end
 
 lualine.setup {
   options = {
+    globalstatus = false,
     icons_enabled = false,
     theme = 'catppuccin',
-    component_separators = { left = '', right = '' },
-    section_separators = { left = '', right = '' },
+    -- component_separators = { left = '', right = '' },
+    -- section_separators = { left = '', right = '' },
     disabled_filetypes = {
-      statusline = {},
+      statusline = {
+        'NvimTree'
+      },
       winbar = {},
     },
     ignore_focus = {},
     always_divide_middle = true,
-    globalstatus = false,
     refresh = {
       statusline = 1000,
       tabline = 1000,
@@ -30,18 +32,18 @@ lualine.setup {
     }
   },
   sections = {
-    lualine_a = { 'branch' },
-    lualine_b = { 'filename', 'diagnostics' },
-    lualine_c = {},
-    lualine_x = { MetalsStatus, 'filetype' },
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = { { 'filename', path = 1 }, 'diagnostics' },
+    lualine_x = { MetalsStatus },
     lualine_y = { 'searchcount' },
     lualine_z = { 'progress', 'location' }
   },
   inactive_sections = {
     lualine_a = {},
     lualine_b = {},
-    lualine_c = { 'filename' },
-    lualine_x = { 'location' },
+    lualine_c = { { 'filename', path = 1 } },
+    lualine_x = { 'progress' },
     lualine_y = {},
     lualine_z = {}
   },
