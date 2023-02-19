@@ -9,20 +9,35 @@ vim.opt.termguicolors = true
 
 -- empty setup using defaults
 require("nvim-tree").setup({
+  view = {
+    signcolumn = "yes",
+  },
+  git = {
+    show_on_dirs = false,
+  },
   diagnostics = {
-    enable = true,
+    enable = false,
     --    severity = {
     --      min = vim.diagnostic.severity.ERROR,
     --      max = vim.diagnostic.severity.ERROR
     --    }
   },
   renderer = {
+    special_files = { "Cargo.toml", "README.md", "package.json", "build.sbt" },
+    add_trailing = true,
+    highlight_git = true,
     icons = {
+      git_placement = 'after',
+      glyphs = {
+        git = {
+          unstaged = ' '
+        }
+      },
       show = {
-        file = false,
-        folder = false,
+        --   file = false,
+        -- folder = false,
         folder_arrow = false,
-        git = true
+        --   git = true
       }
     }
   }

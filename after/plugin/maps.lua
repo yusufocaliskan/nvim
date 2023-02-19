@@ -40,9 +40,7 @@ require('toggleterm').setup({
 require("nvim-autopairs").setup({})
 require('mini.comment').setup({})
 require('mini.surround').setup({})
-require('mini.ai').setup({
-
-})
+require('mini.ai').setup({})
 require('mini.bufremove').setup({})
 
 local dap = require("dap")

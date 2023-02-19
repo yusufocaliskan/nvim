@@ -16,10 +16,6 @@ packer.startup(function(use)
   use 'folke/which-key.nvim'
   use 'echasnovski/mini.nvim'
   use 'windwp/nvim-autopairs'
-  use {
-    "kylechui/nvim-surround",
-    tag = "*", -- Use for stability; omit to use `main` branch for the latest features
-  }
 
   use { 'akinsho/bufferline.nvim', tag = "v3.*", requires = 'nvim-tree/nvim-web-devicons' }
 
@@ -94,7 +90,7 @@ packer.startup(function(use)
   -- Scala
   use {
     'scalameta/nvim-metals',
-    requires = { "nvim-lua/plenary.nvim" }
+    requires = { "nvim-lua/plenary.nvim" },
   }
 
   -- Typescript

@@ -6,11 +6,12 @@ on_attach = function(client, bufnr)
   end
 
   -- LSP
-  vim.keymap.set('n', '<leader>r', "<cmd>Lspsaga rename<cr>", named_opts('Rename'))
+  vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, named_opts('Rename'))
   vim.keymap.set('n', '<leader>e', require('telescope.builtin').lsp_dynamic_workspace_symbols,
     named_opts('LSP Workspace Symbols'))
-  vim.keymap.set('n', '<leader>k', "<cmd>Lspsaga hover_doc<CR>", named_opts('LSP Hover (docs)'))
-  vim.keymap.set('n', '<leader>a', "<cmd>Lspsaga code_action<CR>", named_opts('Code [A]ction'))
+  vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, named_opts('LSP Hover'))
+  vim.keymap.set('n', 'K', vim.lsp.buf.hover, named_opts('LSP Hover'))
+  vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action, named_opts('Code [A]ction'))
   vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, named_opts('[G]o [I]mplementation'))
   vim.keymap.set('n', 'gr', require('telescope.builtin').lsp_references, named_opts('[G]o [R]eference'))
   vim.keymap.set("n", "[d", vim.diagnostic.goto_next, named_opts("Next [D]iagnostic"))
@@ -38,14 +39,15 @@ end
 require("lsp_signature").setup({
   bind = true, -- This is mandatory, otherwise border config won't get registered.
   handler_opts = {
-    border = "rounded",
+    border = "single",
   },
   max_width = 120,
   max_height = 30,
   doc_lines = 20,
   wrap = true,
   -- hi_parameter = "DiagnosticHint", -- Highlight group name to use for active param
-  hint_enable = false,
+  hint_enable = true,
+  hint_prefix = " ",
   toggle_key = '<C-x>'
 })
 
@@ -153,6 +155,10 @@ require('lspconfig').lua_ls.setup {
   },
   capabilities = capabilities,
   on_attach = on_attach
+}
+
+require('lspconfig').tailwindcss.setup {
+
 }
 
 require('lspconfig').terraformls.setup {
