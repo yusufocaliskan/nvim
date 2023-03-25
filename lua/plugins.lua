@@ -11,7 +11,18 @@ packer.startup(function(use)
   use "williamboman/mason.nvim"
   use 'hoob3rt/lualine.nvim' -- Statusline
 
+  -- Colorschemes
   use { "catppuccin/nvim", as = "catppuccin" }
+  use {
+    "mcchrish/zenbones.nvim",
+    -- Optionally install Lush. Allows for more configuration or extending the colorscheme
+    -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
+    -- In Vim, compat mode is turned on as Lush only works in Neovim.
+    requires = "rktjmp/lush.nvim"
+  }
+  use { "pgdouyon/vim-yin-yang" }
+  use { 'w0ng/vim-hybrid' }
+  use { 'sainnhe/everforest' }
 
   use 'folke/which-key.nvim'
   use 'echasnovski/mini.nvim'

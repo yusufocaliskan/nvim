@@ -14,7 +14,8 @@ lualine.setup {
   options = {
     globalstatus = false,
     icons_enabled = false,
-    theme = 'catppuccin',
+    -- color = { fg = '#b7bcb9', bg = '#161718', gui = 'bold' },
+    theme = 'hybrid',
     -- component_separators = { left = '', right = '' },
     -- section_separators = { left = '', right = '' },
     disabled_filetypes = {

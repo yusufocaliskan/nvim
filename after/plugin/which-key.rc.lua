@@ -3,10 +3,10 @@ require('which-key').setup {
     presets = {
       operators = false,
       motions = false,
-      text_objects = false,
+      text_objects = true,
     },
   },
-  triggers = { "<leader>", "g" },
+  triggers = { "<leader>", "g", "[", "]" },
   icons = {
     separator = ''
   },

@@ -37,11 +37,33 @@ require('toggleterm').setup({
   open_mapping = [[<c-\>]],
   direction = 'horizontal'
 })
-require("nvim-autopairs").setup({})
+require('nvim-autopairs').setup({
+  enable_bracket_in_quote = false,
+
+})
+require('nvim-autopairs').add_rule(
+  require('nvim-autopairs.rule')("<", ">", "rust")
+)
+
+-- hello ""
+require('mini.animate').setup({
+  cursor = {
+    enable = false,
+  },
+  scroll = {
+    enable = false
+  }
+})
+require('mini.basics').setup({
+  options = {
+    extra_ui = true,
+  },
+})
 require('mini.comment').setup({})
 require('mini.surround').setup({})
 require('mini.ai').setup({})
 require('mini.bufremove').setup({})
+require('mini.bracketed').setup({})
 
 local dap = require("dap")
 require("dapui").setup()
@@ -109,9 +131,6 @@ keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 keymap.set("n", "<leader>sub", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 keymap.set("x", "<leader>ss", [[:%s/\%V\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
-keymap.set('n', '<C-s>', ':w<CR>', opts)
-keymap.set('i', '<C-s>', '<esc>:w<CR>', opts)
-keymap.set('v', '<C-s>', '<esc>:w<CR>', opts)
 keymap.set('i', 'jk', '<esc>', opts)
 
 keymap.set('n', '<leader>p', '"+p', named_opts('Paste from clipboard'))
@@ -123,8 +142,10 @@ keymap.set('n', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
 keymap.set('v', '<leader>y', '"+y', named_opts("Yank to clipboard"))
 keymap.set('v', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
 
-keymap.set('n', '<C-d>', '<C-d>zz', named_opts("Page down (centered)"))
-keymap.set('n', '<C-u>', '<C-u>zz', named_opts("Page up (centered)"))
+-- Does not play nice with mini.animate, and the point of centering was
+-- to keep context; animation solves that problem
+-- keymap.set('n', '<C-d>', '<C-d>zz', named_opts("Page down (centered)"))
+-- keymap.set('n', '<C-u>', '<C-u>zz', named_opts("Page up (centered)"))
 
 -- Do not yank with x
 keymap.set('n', 'x', '"_x', opts)
@@ -211,21 +232,6 @@ end
 
 vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua Lazygit_Toggle()<CR>",
   { noremap = true, silent = true, desc = "lazygit" })
-
-local augroup = vim.api.nvim_create_augroup
-local autocmd = vim.api.nvim_create_autocmd
-local default_autogroup = augroup('HighlightYank', {})
-
-autocmd('TextYankPost', {
-  group = default_autogroup,
-  pattern = '*',
-  callback = function()
-    vim.highlight.on_yank({
-      higroup = 'IncSearch',
-      timeout = 50,
-    })
-  end,
-})
 
 -- Important
 require("duck").setup {
