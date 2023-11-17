@@ -17,7 +17,7 @@ require('telescope').setup {
   },
   extensions = {
     file_browser = {
-      hijack_netrw = true,
+      hijack_netrw = false,
       -- mappings = {
       --   ["i"] = {
       --     -- remap to going to home directory
@@ -28,15 +28,8 @@ require('telescope').setup {
   }
 }
 
-
-require("mason").setup()
-
 require('gitsigns').setup()
 
-require('toggleterm').setup({
-  open_mapping = [[<c-\>]],
-  direction = 'horizontal'
-})
 require('nvim-autopairs').setup({
   enable_bracket_in_quote = false,
 
@@ -45,15 +38,15 @@ require('nvim-autopairs').add_rule(
   require('nvim-autopairs.rule')("<", ">", "rust")
 )
 
--- hello ""
-require('mini.animate').setup({
-  cursor = {
-    enable = false,
-  },
-  scroll = {
-    enable = false
-  }
-})
+-- No animate; using neovide these days
+-- require('mini.animate').setup({
+--   cursor = {
+--     enable = false,
+--   },
+--   scroll = {
+--     enable = false
+--   }
+-- })
 require('mini.basics').setup({
   options = {
     extra_ui = true,
@@ -124,28 +117,27 @@ keymap.set('i', '<C-j>', '<down>')
 keymap.set('i', '<C-k>', '<up>')
 keymap.set('i', '<C-l>', '<right>')
 
+keymap.set('n', '<C-h>', '<left>')
+keymap.set('n', '<C-j>', '<down>')
+keymap.set('n', '<C-k>', '<up>')
+keymap.set('n', '<C-l>', '<right>')
+
 -- Swap lines up and down
-keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
-keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
+
+keymap.set('v', '<C-j>', ":m '>+1<CR>gv=gv")
+keymap.set('v', '<C-k>', ":m '<-2<CR>gv=gv")
 
 keymap.set("n", "<leader>sub", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 keymap.set("x", "<leader>ss", [[:%s/\%V\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
 keymap.set('i', 'jk', '<esc>', opts)
 
-keymap.set('n', '<leader>p', '"+p', named_opts('Paste from clipboard'))
 keymap.set('x', '<leader>p', '"_dP', named_opts('Paste preserving register'))
 
--- leader yank to clipboard
-keymap.set('n', '<leader>y', '"+y', named_opts("Yank to clipboard"))
-keymap.set('n', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
-keymap.set('v', '<leader>y', '"+y', named_opts("Yank to clipboard"))
-keymap.set('v', '<leader>Y', '"+Y', named_opts("Yank to clipboard"))
-
--- Does not play nice with mini.animate, and the point of centering was
--- to keep context; animation solves that problem
--- keymap.set('n', '<C-d>', '<C-d>zz', named_opts("Page down (centered)"))
--- keymap.set('n', '<C-u>', '<C-u>zz', named_opts("Page up (centered)"))
+-- Does not play nice with mini.animate scroll, use one or the other
+-- I'm using neovide now so ditching these and using mini.animate for now!
+keymap.set('n', '<C-d>', '<C-d>zz', named_opts("Page down (centered)"))
+keymap.set('n', '<C-u>', '<C-u>zz', named_opts("Page up (centered)"))
 
 -- Do not yank with x
 keymap.set('n', 'x', '"_x', opts)
@@ -159,9 +151,21 @@ function ts_grep_from_buffer_dir()
   ts_grep_from_dir(buf_dir)
 end
 
+keymap.set('n', '<tab>', '<C-^>', named_opts('Alternate File'))
+
+local tk = require('telekasten')
+tk.setup({
+  home = vim.fn.expand("~/vim_notes"), -- Put the name of your notes directory here
+})
+
+keymap.set('n', '<leader>n<space>', '<cmd>Telekasten panel<cr>')
+keymap.set('n', '<leader>nd', '<cmd>Telekasten goto_today<cr>')
+keymap.set('n', '<leader>nv', '<cmd>Telekasten paste_img_and_link<cr>')
+keymap.set('n', '<leader>nx', '<cmd>Telekasten toggle_todo<cr>')
+
 keymap.set('n', '<leader>M', require('telescope').extensions.metals.commands, named_opts('Metals command picker'))
 keymap.set('n', '<leader>F', '<cmd>Telescope file_browser path=%:p:h<cr>', named_opts('[F]ile browser at buffer dir'))
-keymap.set('n', '<leader>f', '<cmd>Telescope find_files hidden=true<cr>', named_opts('[F]ind [f]ile'))
+keymap.set('n', '<leader>f', '<cmd>Telescope find_files hidden=true ignored=true<cr>', named_opts('[F]ind [f]ile'))
 keymap.set('n', '<leader>/', require('telescope.builtin').live_grep, named_opts('Grep Workspace'))
 keymap.set('n', '<leader>*', ts_grep_from_buffer_dir, named_opts('Grep Workspace'))
 
@@ -223,21 +227,11 @@ keymap.set("n", "[g", "<cmd>Gitsigns prev_hunk<cr>", named_opts("Prev hunk"))
 keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
 keymap.set("n", "<leader>?", require('telescope.builtin').command_history, named_opts("Command history"))
 
-local Terminal = require('toggleterm.terminal').Terminal
-local lazygit  = Terminal:new({ cmd = "lazygit", hidden = true, direction = "float" })
-
-function Lazygit_Toggle()
-  lazygit:toggle()
-end
-
-vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua Lazygit_Toggle()<CR>",
-  { noremap = true, silent = true, desc = "lazygit" })
-
 -- Important
 require("duck").setup {
   character = "🦆",
   winblend = 100, -- 0 to 100
-  speed = 1, -- optimal: 1 to 99
+  speed = 1,      -- optimal: 1 to 99
   width = 2
 }
 

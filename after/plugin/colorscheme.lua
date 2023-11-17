@@ -17,7 +17,13 @@ require("catppuccin")
 --   mirage = true,
 -- }
 --
--- vim.cmd [[ colorscheme catppuccin ]]
+
+require('onedark').setup {
+  style = 'darker'
+}
+require('onedark').load()
+--vim.cmd [[ colorscheme kanagawa ]]
+--vim.cmd [[ colorscheme nord ]]
 
 -- Available values: 'hard', 'medium'(default), 'soft'
 

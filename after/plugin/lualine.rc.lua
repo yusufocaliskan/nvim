@@ -15,7 +15,7 @@ lualine.setup {
     globalstatus = false,
     icons_enabled = false,
     -- color = { fg = '#b7bcb9', bg = '#161718', gui = 'bold' },
-    theme = 'hybrid',
+    theme = 'auto',
     -- component_separators = { left = '', right = '' },
     -- section_separators = { left = '', right = '' },
     disabled_filetypes = {

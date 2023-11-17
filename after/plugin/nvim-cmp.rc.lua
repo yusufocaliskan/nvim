@@ -50,7 +50,6 @@ cmp.setup({
   sources = cmp.config.sources({
     {
       name = 'nvim_lsp',
-      -- keyword_length = 2,
       max_item_count = 30,
       -- entry_filter = function(entry, ctx)
       --   local kind = entry:get_kind()
@@ -68,16 +67,16 @@ cmp.setup({
   },
   sorting = {
     comparators = {
-      compare.offset,
-      compare.recently_used,
-      compare.locality,
       compare.exact,
-      -- compare.scopes,
+      compare.locality,
+      compare.recently_used,
       compare.score,
-      compare.kind,
+      compare.offset,
+      -- compare.scopes,
       compare.sort_text,
       compare.length,
       compare.order,
+      compare.kind,
     }
   }
 })

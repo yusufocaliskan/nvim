@@ -22,7 +22,7 @@ on_attach = function(client, bufnr)
   vim.keymap.set("n", "]e", function()
     vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
   end, named_opts("Next [E]rror"))
-  vim.keymap.set("n", "<tab>", vim.lsp.buf.format, named_opts("Format buffer"))
+  vim.keymap.set("n", "<leader>bf", vim.lsp.buf.format, named_opts("[F]ormat [b]uffer"))
   -- Enter and Backspace for navigation
   vim.keymap.set('n', '<cr>', vim.lsp.buf.definition, named_opts('Go to definition'))
 

@@ -8,11 +8,11 @@ vim.cmd [[packadd packer.nvim]]
 
 packer.startup(function(use)
   use 'wbthomason/packer.nvim'
-  use "williamboman/mason.nvim"
   use 'hoob3rt/lualine.nvim' -- Statusline
 
   -- Colorschemes
   use { "catppuccin/nvim", as = "catppuccin" }
+  use { "shaunsingh/nord.nvim" }
   use {
     "mcchrish/zenbones.nvim",
     -- Optionally install Lush. Allows for more configuration or extending the colorscheme
@@ -23,6 +23,8 @@ packer.startup(function(use)
   use { "pgdouyon/vim-yin-yang" }
   use { 'w0ng/vim-hybrid' }
   use { 'sainnhe/everforest' }
+  use { 'rebelot/kanagawa.nvim' }
+  use { 'navarasu/onedark.nvim' }
 
   use 'folke/which-key.nvim'
   use 'echasnovski/mini.nvim'
@@ -34,12 +36,10 @@ packer.startup(function(use)
 
   use { "nvim-telescope/telescope-file-browser.nvim" }
   use {
-    'nvim-telescope/telescope.nvim', tag = '0.1.x',
+    'nvim-telescope/telescope.nvim', tag = '0.1.4',
     -- or                            , branch = '0.1.x',
     requires = { { 'nvim-lua/plenary.nvim' } }
   }
-
-  use { "akinsho/toggleterm.nvim", tag = '*' }
 
   use {
     'nvim-tree/nvim-tree.lua',
@@ -51,6 +51,7 @@ packer.startup(function(use)
     'nvim-treesitter/nvim-treesitter-textobjects',
     after = 'nvim-treesitter',
   }
+  use { 'nvim-treesitter/nvim-treesitter-context' }
   use { 'nvim-treesitter/playground' }
 
   use {
@@ -58,11 +59,16 @@ packer.startup(function(use)
     -- tag = 'release' -- To use the latest release (do not use this if you run Neovim nightly or dev builds!)
   }
 
+  use {
+    'renerocksai/telekasten.nvim',
+    requires = { 'nvim-telescope/telescope.nvim' }
+  }
+
   -- LSP
   use 'neovim/nvim-lspconfig'
   use 'lukas-reineke/lsp-format.nvim'
   -- LSP status indicator
-  use 'j-hui/fidget.nvim'
+  use { 'j-hui/fidget.nvim', tag = "legacy" }
   use 'lvimuser/lsp-inlayhints.nvim'
 
   use 'rrethy/vim-illuminate'
@@ -109,6 +115,8 @@ packer.startup(function(use)
   use {
     'jose-elias-alvarez/null-ls.nvim'
   }
+
+  use { 'github/copilot.vim' }
 
   -- important
   use {
