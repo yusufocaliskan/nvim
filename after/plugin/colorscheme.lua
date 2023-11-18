@@ -1,5 +1,3 @@
-require("catppuccin")
-
 -- vim.api.nvim_set_hl(0, 'IlluminatedWordText', vim.api.nvim_get_hl_by_name('Search', false))
 -- vim.cmd [[ hi IlluminatedWordText NONE ]]
 -- vim.cmd [[ hi! link IlluminatedWordText Search ]]
@@ -18,10 +16,12 @@ require("catppuccin")
 -- }
 --
 
-require('onedark').setup {
-  style = 'darker'
-}
-require('onedark').load()
+require("catppuccin")
+vim.cmd [[ colorscheme catppuccin ]]
+-- require('onedark').setup {
+--   style = 'darker'
+-- }
+-- require('onedark').load()
 --vim.cmd [[ colorscheme kanagawa ]]
 --vim.cmd [[ colorscheme nord ]]
 

@@ -94,42 +94,18 @@ require('lspconfig')['rust_analyzer'].setup {
   capabilities = capabilities,
   on_attach = on_attach
 }
-require("lsp-inlayhints").setup()
---
-vim.api.nvim_create_augroup("LspAttach_inlayhints", {})
-vim.api.nvim_create_autocmd("LspAttach", {
-  group = "LspAttach_inlayhints",
-  callback = function(args)
-    if not (args.data and args.data.client_id) then
-      return
-    end
 
-    local bufnr = args.buf
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    require("lsp-inlayhints").on_attach(client, bufnr, false)
-  end,
-})
-
-local null_ls = require("null-ls")
-null_ls.setup({
-  sources = {
-    null_ls.builtins.diagnostics.eslint,
-    null_ls.builtins.formatting.prettier,
-    require("typescript.extensions.null-ls.code-actions"),
-  },
-})
-
-require("typescript").setup({
-  disable_commands = false, -- prevent the plugin from creating Vim commands
-  debug = false, -- enable debug logging for commands
-  go_to_source_definition = {
-    fallback = true, -- fall back to standard LSP definition on failure
-  },
-  server = { -- pass options to lspconfig's setup method
-    capabilities = capabilities,
-    on_attach = on_attach
-  },
-})
+-- require("typescript").setup({
+--   disable_commands = false, -- prevent the plugin from creating Vim commands
+--   debug = false, -- enable debug logging for commands
+--   go_to_source_definition = {
+--     fallback = true, -- fall back to standard LSP definition on failure
+--   },
+--   server = { -- pass options to lspconfig's setup method
+--     capabilities = capabilities,
+--     on_attach = on_attach
+--   },
+-- })
 
 
 require('lspconfig').lua_ls.setup {

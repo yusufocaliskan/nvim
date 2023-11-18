@@ -58,9 +58,6 @@ require('mini.ai').setup({})
 require('mini.bufremove').setup({})
 require('mini.bracketed').setup({})
 
-local dap = require("dap")
-require("dapui").setup()
-
 -- Gutter Symbols
 local signs = {
   Error = "E",
@@ -182,8 +179,8 @@ keymap.set('n', '<leader>x', MiniBufremove.delete, named_opts('Close buffer'))
 keymap.set('n', '<leader><tab>', require('telescope.builtin').buffers, named_opts('Open buffer picker'))
 
 -- d for debug
-keymap.set('n', '<leader>Dc', dap.continue, named_opts('Go (continue)'))
-keymap.set('n', '<leader>Dt', dap.repl.toggle, named_opts('Toggle debug repl'))
+-- keymap.set('n', '<leader>Dc', dap.continue, named_opts('Go (continue)'))
+-- keymap.set('n', '<leader>Dt', dap.repl.toggle, named_opts('Toggle debug repl'))
 
 keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 keymap.set('n', '<C-w><cr>', "<cmd>only<cr>", named_opts('Close other windows'))
@@ -205,19 +202,9 @@ keymap.set('n', '<leader>h/', function() ts_grep_from_dir('~/.config/nvim') end,
 keymap.set('n', '<leader>htc', colemak_toggle, named_opts('Toggle -> Colemak'))
 
 -- Goto
-local harpoon_ui = require('harpoon.ui')
-local harpoon_mark = require('harpoon.mark')
 
 keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
 keymap.set('n', 'gp', '<Cmd>bprev<CR>', named_opts('Previous Buffer'))
-
--- <leader>m for 'mark'
-keymap.set('n', 'gl', harpoon_ui.toggle_quick_menu, named_opts('Harpoon UI'))
-keymap.set('n', 'ga', harpoon_mark.add_file, named_opts('Harpoon Add'))
-keymap.set('n', 'g1', function() harpoon_ui.nav_file(1) end, named_opts('Harpoon 1'))
-keymap.set('n', 'g2', function() harpoon_ui.nav_file(2) end, named_opts('Harpoon 2'))
-keymap.set('n', 'g3', function() harpoon_ui.nav_file(3) end, named_opts('Harpoon 3'))
-keymap.set('n', 'g4', function() harpoon_ui.nav_file(4) end, named_opts('Harpoon 3'))
 
 -- Forward / Back
 keymap.set("n", "] ", "o<esc>", named_opts("New line down"))
@@ -226,13 +213,3 @@ keymap.set("n", "]g", "<cmd>Gitsigns next_hunk<cr>", named_opts("Next hunk"))
 keymap.set("n", "[g", "<cmd>Gitsigns prev_hunk<cr>", named_opts("Prev hunk"))
 keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
 keymap.set("n", "<leader>?", require('telescope.builtin').command_history, named_opts("Command history"))
-
--- Important
-require("duck").setup {
-  character = "🦆",
-  winblend = 100, -- 0 to 100
-  speed = 1,      -- optimal: 1 to 99
-  width = 2
-}
-
-keymap.set('n', '<leader>Dk', function() require("duck").cook() end, named_opts("Kill tree"))
