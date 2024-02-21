@@ -20,6 +20,10 @@ keymap.set("n", "<C-a>", "gg<S-v>G")
 keymap.set("n", "<Leader>o", "o<Esc>^Da", opts)
 keymap.set("n", "<Leader>O", "O<Esc>^Da", opts)
 
+-- to move up or down the selected lines
+keymap.set("v", "<C-j>", ":m '>+1<CR>gv=gv", opts)
+keymap.set("v", "<C-k>", ":m '<-2<CR>gv=gv", opts)
+
 -- Jumplist
 keymap.set("n", "<C-m>", "<C-i>", opts)
 
@@ -54,10 +58,13 @@ keymap.set("n", "==", ":Vexplore<CR>", { noremap = true, silent = true })
 keymap.set("n", "\\\\", ":bd<CR>", { noremap = true, silent = true })
 keymap.set("n", "r;", ":noh<CR><CR>", { noremap = true, silent = true })
 
-keymap.set("n", "<leader>r", function()
+keymap.set("n", "<Leader>r", function()
 	require("craftzdog.utils").replaceHexWithHSL()
 end)
 
 -- fzfLua
 vim.api.nvim_set_keymap("n", ";r", "<cmd>FzfLua grep_project<cr>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", ";f", "<cmd>FzfLua files<cr>", { noremap = true, silent = true })
+
+-- Replaces all the words with the new word
+keymap.set("n", "<Leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
