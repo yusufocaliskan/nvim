@@ -16,8 +16,17 @@
 -- }
 --
 
-require("catppuccin")
-vim.cmd [[ colorscheme catppuccin ]]
+-- require("catppuccin")
+require('kanagawa').setup {
+  keywordStyle = { italic = false },
+  commentStyle = { italic = false },
+  statementStyle = { bold = true },
+  transparent = false,
+  background = {
+    dark = "dragon"
+  }
+}
+vim.cmd [[ colorscheme kanagawa ]]
 -- require('onedark').setup {
 --   style = 'darker'
 -- }

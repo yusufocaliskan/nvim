@@ -1,23 +1,27 @@
 require('which-key').setup {
   plugins = {
+    marks = true,
+    registers = true,
     presets = {
+      marks = true,
       operators = false,
       motions = false,
       text_objects = true,
+      g = true,
     },
   },
-  triggers = { "<leader>", "g", "[", "]" },
+  triggers = "auto",
   icons = {
     separator = ''
   },
   window = {
-    position = 'top',
+    position = 'bottom',
     border = 'single',
     padding = { 1, 1, 1, 1 },
   },
-  layout = {
-    align = 'right',
-    spacing = 1,
-    height = { max = 8 }
-  }
+  -- layout = {
+  --   align = 'right',
+  --   spacing = 1,
+  --   height = { max = 12 }
+  -- }
 }

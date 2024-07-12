@@ -51,3 +51,6 @@ vim.opt.updatetime = 50
 vim.opt.formatoptions:append { 'r' }
 
 vim.opt.signcolumn = 'yes'
+
+-- For Neovide
+vim.opt.guifont = { "JetBrainsMonoNL Nerd Font", ":h12" }

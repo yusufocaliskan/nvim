@@ -15,28 +15,21 @@ end
 vim.opt.rtp:prepend(lazypath)
 local plugins = {
   { 'navarasu/onedark.nvim', lazy = true },
-  { "catppuccin/nvim",       name = "catppuccin" },
+  { "catppuccin/nvim",       name = "catppuccin", lazy = true },
   { "shaunsingh/nord.nvim",  lazy = true },
   { "pgdouyon/vim-yin-yang", lazy = true },
-  { 'rebelot/kanagawa.nvim', lazy = true },
+  { 'rebelot/kanagawa.nvim', lazy = false },
+
+
 
   'folke/which-key.nvim',
   'echasnovski/mini.nvim',
-  'windwp/nvim-autopairs',
-  { 'akinsho/bufferline.nvim',                    version = "v3.*" },
+  { 'windwp/nvim-autopairs',                      event = "InsertEnter",                   config = true },
+  { 'akinsho/bufferline.nvim',                    requires = "nvim-tree/nvim-web-devicons" },
 
-  {
-    "mrquantumcodes/bufferchad.nvim",
-    dependencies = {
-      { "nvim-lua/plenary.nvim" },
-      { "MunifTanjim/nui.nvim" },
-      { "stevearc/dressing.nvim" },
-      { "nvim-telescope/telescope.nvim" } -- needed for fuzzy search, but should work fine even without it
-    }
-  },
+  { "nvim-telescope/telescope.nvim",              version = "0.1.8",                       dependencies = { 'nvim-lua/plenary.nvim', 'nvim-tree/nvim-web-devicons' } },
   { "nvim-telescope/telescope-file-browser.nvim", lazy = true },
-  { "nvim-telescope/telescope.nvim",              version = "0.1.4", dependencies = { 'nvim-lua/plenary.nvim' } },
-  'nvim-tree/nvim-tree.lua',
+  -- 'nvim-tree/nvim-tree.lua',
 
   {
     'nvim-treesitter/nvim-treesitter',
@@ -56,22 +49,23 @@ local plugins = {
     lazy = true
   },
 
+  {
+    'stevearc/oil.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
+
   { 'neovim/nvim-lspconfig', lazy = true },
   'lukas-reineke/lsp-format.nvim',
-  { 'j-hui/fidget.nvim',     version = 'legacy' },
   'rrethy/vim-illuminate',
   {
     'folke/trouble.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
-    config = function(trouble)
-      require('trouble').setup {
-        auto_preview = false,
-      }
-    end,
     lazy = true,
   },
-  { 'glepnir/lspsaga.nvim',     branch = "main", lazy = true },
-  { 'ray-x/lsp_signature.nvim', lazy = true },
+  { 'glepnir/lspsaga.nvim',  branch = "main", lazy = true },
+  -- { 'ray-x/lsp_signature.nvim', lazy = true },
 
   {
     'hrsh7th/nvim-cmp',
@@ -83,16 +77,24 @@ local plugins = {
       'hrsh7th/cmp-cmdline'
     }
   },
-  { 'scalameta/nvim-metals', dependencies = { 'nvim-lua/plenary.nvim' }, lazy = true },
-  -- { 'github/copilot.vim' }
+  { 'scalameta/nvim-metals',  dependencies = { 'nvim-lua/plenary.nvim' }, lazy = true },
+  { 'zbirenbaum/copilot.lua', lazy = true },
+  { 'ggandor/leap.nvim',      lazy = false },
 
 }
+
 require("lazy").setup(plugins, opts)
 
-require("bufferchad").setup({
-  mapping = "<leader>bb",       -- Map any key, or set to NONE to disable key mapping
-  mark_mapping = "<leader>bm",  -- The keybinding to display just the marked buffers
-  order = "LAST_USED_UP",       -- LAST_USED_UP (default)/ASCENDING/DESCENDING/REGULAR
-  style = "default",            -- default, modern (requires dressing.nvim and nui.nvim), telescope (requires telescope.nvim)
-  close_mapping = "<Esc><Esc>", -- only for the default style window.
-})
+-- todo: finish setting up copilot https://github.com/zbirenbaum/copilot.lua?ref=tamerlan.dev
+
+require("leap").create_default_mappings()
+
+require("oil").setup()
+
+-- require("bufferchad").setup({
+--   mapping = "<leader>bb",       -- Map any key, or set to NONE to disable key mapping
+--   mark_mapping = "<leader>bm",  -- The keybinding to display just the marked buffers
+--   order = "LAST_USED_UP",       -- LAST_USED_UP (default)/ASCENDING/DESCENDING/REGULAR
+--   style = "default",            -- default, modern (requires dressing.nvim and nui.nvim), telescope (requires telescope.nvim)
+--   close_mapping = "<Esc><Esc>", -- only for the default style window.
+-- })

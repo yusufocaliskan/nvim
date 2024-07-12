@@ -26,6 +26,10 @@ on_attach = function(client, bufnr)
   -- Enter and Backspace for navigation
   vim.keymap.set('n', '<cr>', vim.lsp.buf.definition, named_opts('Go to definition'))
 
+  require('trouble').setup {
+    auto_preview = false,
+  }
+
   vim.keymap.set(
     'n',
     '<leader>d',
@@ -36,41 +40,49 @@ on_attach = function(client, bufnr)
   -- ... custom code ...
 end
 
-require("lsp_signature").setup({
-  bind = true, -- This is mandatory, otherwise border config won't get registered.
-  handler_opts = {
-    border = "single",
-  },
-  max_width = 120,
-  max_height = 30,
-  doc_lines = 20,
-  wrap = true,
-  -- hi_parameter = "DiagnosticHint", -- Highlight group name to use for active param
-  hint_enable = true,
-  hint_prefix = " ",
-  toggle_key = '<C-x>'
-})
+-- require("lsp_signature").setup({
+--   bind = true, -- This is mandatory, otherwise border config won't get registered.
+--   handler_opts = {
+--     border = "single",
+--   },
+--   max_width = 120,
+--   max_height = 30,
+--   doc_lines = 20,
+--   wrap = true,
+--   -- hi_parameter = "DiagnosticHint", -- Highlight group name to use for active param
+--   hint_enable = true,
+--   hint_prefix = " ",
+--   toggle_key = '<C-x>'
+-- })
+--
+
 
 require("illuminate").configure {
   delay = 0,
+
+
   filetypes_denylist = {
     'NvimTree', 'TelescopePrompt'
   },
 
 }
+vim.keymap.set('n', '<leader>th', require('illuminate').toggle)
+
+vim.opt.makeprg = 'cargo check'
+
 
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
-  -- Enable underline, use default values
-  underline = false,
-  -- Enable virtual text only on Warning or above, override spacing to 2
-  virtual_text = {
-    spacing = 2,
-    severity_limit = "Warning",
-  },
-}
+    -- Enable underline, use default values
+    underline = false,
+    -- Enable virtual text only on Warning or above, override spacing to 2
+    virtual_text = {
+      spacing = 2,
+      severity_limit = "Warning",
+    },
+  }
 )
 
 require('lspconfig')['rust_analyzer'].setup {
@@ -106,6 +118,12 @@ require('lspconfig')['rust_analyzer'].setup {
 --     on_attach = on_attach
 --   },
 -- })
+--
+
+require('lspconfig').ocamllsp.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 
 require('lspconfig').lua_ls.setup {
@@ -142,6 +160,7 @@ require('lspconfig').terraformls.setup {
 }
 
 require('lspconfig').zls.setup {
+  capabilities = capabilities,
   on_attach = on_attach
 }
 

@@ -30,14 +30,6 @@ require('telescope').setup {
 
 require('gitsigns').setup()
 
-require('nvim-autopairs').setup({
-  enable_bracket_in_quote = false,
-
-})
-require('nvim-autopairs').add_rule(
-  require('nvim-autopairs.rule')("<", ">", "rust")
-)
-
 -- No animate; using neovide these days
 -- require('mini.animate').setup({
 --   cursor = {
@@ -53,10 +45,11 @@ require('mini.basics').setup({
   },
 })
 require('mini.comment').setup({})
-require('mini.surround').setup({})
+-- require('mini.surround').setup({})
 require('mini.ai').setup({})
 require('mini.bufremove').setup({})
 require('mini.bracketed').setup({})
+require('mini.pairs').setup({})
 
 -- Gutter Symbols
 local signs = {
@@ -123,6 +116,8 @@ keymap.set('n', '<C-l>', '<right>')
 
 keymap.set('v', '<C-j>', ":m '>+1<CR>gv=gv")
 keymap.set('v', '<C-k>', ":m '<-2<CR>gv=gv")
+
+keymap.set('t', '<Esc>', '<C-\\><C-n>')
 
 keymap.set("n", "<leader>sub", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 keymap.set("x", "<leader>ss", [[:%s/\%V\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
