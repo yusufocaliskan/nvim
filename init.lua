@@ -61,11 +61,36 @@ local plugins = {
   'rrethy/vim-illuminate',
   {
     'folke/trouble.nvim',
+    cmd = "Trouble",
+    opts = {},
     dependencies = { 'nvim-tree/nvim-web-devicons' },
-    lazy = true,
+    keys = {
+      {
+        "<leader>d", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer [D]iagnostics (Trouble)"
+      }
+    }
   },
   { 'glepnir/lspsaga.nvim',  branch = "main", lazy = true },
   -- { 'ray-x/lsp_signature.nvim', lazy = true },
+  {
+    'stevearc/overseer.nvim',
+    event = "VeryLazy",
+    keys = {
+      { "<leader>tR", "<cmd>OverseerRunCmd ./run.sh %<cr>", desc = "[T]ask [R]un file (for k1)" },
+      { "<leader>tt", "<cmd>OverseerToggle<cr>",            desc = "[T]oggle [t]asks" }
+    },
+    config = function()
+      local overseer = require("overseer")
+      overseer.setup({
+        task_list = {
+          bindings = {
+            ["r"] = "<CMD>OverseerQuickAction restart<CR>",
+          },
+        },
+      })
+      overseer.load_task_bundle('k1', { autostart = false })
+    end
+  },
 
   {
     'hrsh7th/nvim-cmp',

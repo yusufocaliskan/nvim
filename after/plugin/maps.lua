@@ -1,5 +1,11 @@
 vim.g.mapleader = ' '
 -- Telescope
+
+--local ts_actions = require("telescope.actions")
+local ts_open_with_trouble = require("trouble.sources.telescope").open
+-- Use this to add more results without clearing the trouble list
+--local ts_add_to_trouble = require("trouble.sources.telescope").add
+
 require('telescope').setup {
   pickers = {
     lsp_references = {
@@ -8,6 +14,10 @@ require('telescope').setup {
     }
   },
   defaults = {
+    mappings = {
+      i = { ["<c-t>"] = ts_open_with_trouble },
+      n = { ["<c-t>"] = ts_open_with_trouble },
+    },
     file_ignore_patterns = { ".git/", "node_modules/" },
     layout_config = {
       horizontal = {
@@ -30,15 +40,6 @@ require('telescope').setup {
 
 require('gitsigns').setup()
 
--- No animate; using neovide these days
--- require('mini.animate').setup({
---   cursor = {
---     enable = false,
---   },
---   scroll = {
---     enable = false
---   }
--- })
 require('mini.basics').setup({
   options = {
     extra_ui = true,
@@ -143,8 +144,6 @@ function ts_grep_from_buffer_dir()
   ts_grep_from_dir(buf_dir)
 end
 
-keymap.set('n', '<tab>', '<C-^>', named_opts('Alternate File'))
-
 local tk = require('telekasten')
 tk.setup({
   home = vim.fn.expand("~/vim_notes"), -- Put the name of your notes directory here
@@ -152,6 +151,7 @@ tk.setup({
 
 keymap.set('n', '<leader>n<space>', '<cmd>Telekasten panel<cr>')
 keymap.set('n', '<leader>nd', '<cmd>Telekasten goto_today<cr>')
+keymap.set('n', '<leader>nw', '<cmd>Telekasten goto_thisweek<cr>')
 keymap.set('n', '<leader>nv', '<cmd>Telekasten paste_img_and_link<cr>')
 keymap.set('n', '<leader>nx', '<cmd>Telekasten toggle_todo<cr>')
 
@@ -177,7 +177,6 @@ keymap.set('n', '<leader><tab>', require('telescope.builtin').buffers, named_opt
 -- keymap.set('n', '<leader>Dc', dap.continue, named_opts('Go (continue)'))
 -- keymap.set('n', '<leader>Dt', dap.repl.toggle, named_opts('Toggle debug repl'))
 
-keymap.set('n', '<leader>w', "<C-w>", named_opts('+window'))
 keymap.set('n', '<C-w><cr>', "<cmd>only<cr>", named_opts('Close other windows'))
 
 keymap.set('n', '<leader>1', '<Cmd>NvimTreeFindFileToggle<CR>', named_opts("Tree"))

@@ -31,7 +31,6 @@ vim.cmd [[ colorscheme kanagawa ]]
 --   style = 'darker'
 -- }
 -- require('onedark').load()
---vim.cmd [[ colorscheme kanagawa ]]
 --vim.cmd [[ colorscheme nord ]]
 
 -- Available values: 'hard', 'medium'(default), 'soft'

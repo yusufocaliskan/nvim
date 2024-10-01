@@ -1,5 +1,7 @@
 vim.cmd('autocmd!')
 
+vim.keymap.set("n", "R", "<nop>")
+
 -- I can't help it I'm a clipboard man
 vim.cmd [[ set clipboard+=unnamedplus ]]
 
@@ -54,3 +56,4 @@ vim.opt.signcolumn = 'yes'
 
 -- For Neovide
 vim.opt.guifont = { "JetBrainsMonoNL Nerd Font", ":h12" }
+vim.g.neovide_scale_factor = 1.5
