@@ -20,9 +20,24 @@ local plugins = {
   { "pgdouyon/vim-yin-yang", lazy = true },
   { 'rebelot/kanagawa.nvim', lazy = false },
 
+  -- {
+  --   "folke/noice.nvim",
+  --   event = "VeryLazy",
+  --   opts = {
+  --     -- add any options here
+  --   },
+  --   dependencies = {
+  --     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+  --     "MunifTanjim/nui.nvim",
+  --     -- OPTIONAL:
+  --     --   `nvim-notify` is only needed, if you want to use the notification view.
+  --     --   If not available, we use `mini` as the fallback
+  --     "rcarriga/nvim-notify",
+  --   }
+  -- },
 
 
-  'folke/which-key.nvim',
+
   'echasnovski/mini.nvim',
   { 'windwp/nvim-autopairs',                      event = "InsertEnter",                   config = true },
   { 'akinsho/bufferline.nvim',                    requires = "nvim-tree/nvim-web-devicons" },
@@ -54,6 +69,9 @@ local plugins = {
     opts = {},
     -- Optional dependencies
     dependencies = { "nvim-tree/nvim-web-devicons" },
+    keys = {
+      { "<leader>1", "<cmd>lua require('oil').open_float()<cr>", desc = "Open file browser" }
+    }
   },
 
   { 'neovim/nvim-lspconfig', lazy = true },
@@ -93,15 +111,47 @@ local plugins = {
   },
 
   {
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-buffer',
-      'hrsh7th/cmp-cmdline'
+    'saghen/blink.cmp',
+    lazy = false,
+    -- dependencies = 'rafamadriz/friendly-snippets',
+
+    -- use a release tag to download pre-built binaries
+    version = 'v0.*',
+    -- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+    -- build = 'cargo build --release',
+
+    opts = {
+      keymap = {
+        select_prev = { '<Up>', '<C-p>' },
+        select_next = { '<Down>', '<C-n>' },
+      },
+      highlight = {
+        -- sets the fallback highlight groups to nvim-cmp's highlight groups
+        -- useful for when your theme doesn't support blink.cmp
+        -- will be removed in a future release, assuming themes add support
+        use_nvim_cmp_as_default = true,
+      },
+      -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+      -- adjusts spacing to ensure icons are aligned
+      nerd_font_variant = 'normal',
+
+      -- experimental auto-brackets support
+      accept = { auto_brackets = { enabled = true } },
+
+      -- experimental signature help support
+      trigger = { signature_help = { enabled = true } }
     }
   },
+  -- {
+  --   'hrsh7th/nvim-cmp',
+  --   dependencies = {
+  --     'L3MON4D3/LuaSnip',
+  --     'saadparwaiz1/cmp_luasnip',
+  --     'hrsh7th/cmp-nvim-lsp',
+  --     'hrsh7th/cmp-buffer',
+  --     'hrsh7th/cmp-cmdline',
+  --   }
+  -- },
   { 'scalameta/nvim-metals',  dependencies = { 'nvim-lua/plenary.nvim' }, lazy = true },
   { 'zbirenbaum/copilot.lua', lazy = true },
   { 'ggandor/leap.nvim',      lazy = false },

@@ -16,14 +16,19 @@
 -- }
 --
 
--- require("catppuccin")
+-- require("catppuccin").setup({
+--   no_italic = true,
+--   no_underline = true,
+-- })
+-- vim.cmd [[ colorscheme catppuccin ]]
+
 require('kanagawa').setup {
   keywordStyle = { italic = false },
   commentStyle = { italic = false },
   statementStyle = { bold = true },
   transparent = false,
   background = {
-    dark = "dragon"
+    --dark = "dragon"
   }
 }
 vim.cmd [[ colorscheme kanagawa ]]

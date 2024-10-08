@@ -56,7 +56,8 @@ vim.keymap.set('n', '<leader>th', require('illuminate').toggle)
 vim.opt.makeprg = 'cargo check'
 
 
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+-- local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local capabilities = {}
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {

@@ -12,6 +12,8 @@ vim.scriptencoding = 'utf-8'
 vim.opt.encoding = 'utf-8'
 vim.opt.fileencoding = 'utf-8'
 
+vim.opt.completeopt = menu, menuone, noselect
+
 vim.wo.number = true
 
 vim.opt.title = true
@@ -56,4 +58,4 @@ vim.opt.signcolumn = 'yes'
 
 -- For Neovide
 vim.opt.guifont = { "JetBrainsMonoNL Nerd Font", ":h12" }
-vim.g.neovide_scale_factor = 1.5
+vim.g.neovide_scale_factor = 1.25

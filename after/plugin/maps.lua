@@ -51,6 +51,60 @@ require('mini.ai').setup({})
 require('mini.bufremove').setup({})
 require('mini.bracketed').setup({})
 require('mini.pairs').setup({})
+require('mini.clue').setup({
+  window = {
+    delay = 0,
+  },
+  triggers = {
+    -- Leader triggers
+    { mode = 'n', keys = '<Leader>' },
+    { mode = 'x', keys = '<Leader>' },
+    -- Bracketed
+    { mode = 'n', keys = '[' },
+    { mode = 'n', keys = ']' },
+
+    -- Built-in completion
+    { mode = 'i', keys = '<C-x>' },
+
+    -- `g` key
+    { mode = 'n', keys = 'g' },
+    { mode = 'x', keys = 'g' },
+
+    -- Marks
+    { mode = 'n', keys = "'" },
+    { mode = 'n', keys = '`' },
+    { mode = 'x', keys = "'" },
+    { mode = 'x', keys = '`' },
+
+    -- Registers
+    { mode = 'n', keys = '"' },
+    { mode = 'x', keys = '"' },
+    { mode = 'i', keys = '<C-r>' },
+    { mode = 'c', keys = '<C-r>' },
+
+    -- Window commands
+    { mode = 'n', keys = '<C-w>' },
+
+    -- `z` key
+    { mode = 'n', keys = 'z' },
+    { mode = 'x', keys = 'z' },
+  },
+
+  clues = {
+    -- Enhance this by adding descriptions for <Leader> mapping groups
+    require('mini.clue').gen_clues.builtin_completion(),
+    require('mini.clue').gen_clues.g(),
+    require('mini.clue').gen_clues.marks(),
+    require('mini.clue').gen_clues.registers(),
+    require('mini.clue').gen_clues.windows(),
+    require('mini.clue').gen_clues.z(),
+    { mode = 'n', keys = '<leader>b', desc = '+Buffers' },
+    { mode = 'n', keys = '<leader>t', desc = '+Tasks' },
+    { mode = 's', keys = '<leader>s', desc = '+Show' },
+    { mode = 'n', keys = ']',         desc = '+Next' },
+    { mode = 'n', keys = '[',         desc = '+Prev' },
+  },
+})
 
 -- Gutter Symbols
 local signs = {
@@ -177,10 +231,6 @@ keymap.set('n', '<leader><tab>', require('telescope.builtin').buffers, named_opt
 -- keymap.set('n', '<leader>Dc', dap.continue, named_opts('Go (continue)'))
 -- keymap.set('n', '<leader>Dt', dap.repl.toggle, named_opts('Toggle debug repl'))
 
-keymap.set('n', '<C-w><cr>', "<cmd>only<cr>", named_opts('Close other windows'))
-
-keymap.set('n', '<leader>1', '<Cmd>NvimTreeFindFileToggle<CR>', named_opts("Tree"))
-
 -- <leader>h for help
 function edit_neovim()
   require('telescope.builtin').find_files {
@@ -192,8 +242,10 @@ end
 
 keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('[O]pen config dir'))
 keymap.set('n', '<leader>hr', '<cmd>source<cr>', named_opts('Source current buffer'))
+-- keymap.set('n', '<leader>hr', '<cmd>lua <c-r>*<cr>', named_opts('Run yanked'))
 keymap.set('n', '<leader>h/', function() ts_grep_from_dir('~/.config/nvim') end, named_opts('Grep config dir'))
 keymap.set('n', '<leader>htc', colemak_toggle, named_opts('Toggle -> Colemak'))
+print('asdfasdfs')
 
 -- Goto
 
