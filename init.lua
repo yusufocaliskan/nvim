@@ -20,29 +20,65 @@ local plugins = {
   { "pgdouyon/vim-yin-yang", lazy = true },
   { 'rebelot/kanagawa.nvim', lazy = false },
 
-  -- {
-  --   "folke/noice.nvim",
-  --   event = "VeryLazy",
-  --   opts = {
-  --     -- add any options here
-  --   },
-  --   dependencies = {
-  --     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-  --     "MunifTanjim/nui.nvim",
-  --     -- OPTIONAL:
-  --     --   `nvim-notify` is only needed, if you want to use the notification view.
-  --     --   If not available, we use `mini` as the fallback
-  --     "rcarriga/nvim-notify",
-  --   }
-  -- },
-
-
+  {
+    'nanozuki/tabby.nvim',
+    -- dependencies = 'nvim-tree/nvim-web-devicons',
+    config = function()
+      -- configs...
+      local theme = {
+        fill = 'TabLineFill',
+        -- Also you can do this: fill = { fg='#f2e9de', bg='#907aa9', style='italic' }
+        head = 'TabLine',
+        current_tab = 'TabLineSel',
+        tab = 'TabLine',
+        win = 'TabLine',
+        tail = 'TabLine',
+      }
+      require('tabby').setup({
+        line = function(line)
+          return {
+            {
+              { '  ', hl = theme.head },
+              line.sep('', theme.head, theme.fill),
+            },
+            line.tabs().foreach(function(tab)
+              local hl = tab.is_current() and theme.current_tab or theme.tab
+              return {
+                line.sep('', hl, theme.fill),
+                tab.number(),
+                tab.name(),
+                line.sep('', hl, theme.fill),
+                hl = hl,
+                margin = ' ',
+              }
+            end),
+            line.spacer(),
+            line.wins_in_tab(line.api.get_current_tab()).foreach(function(win)
+              return {
+                line.sep('', theme.win, theme.fill),
+                win.is_current() and '' or '',
+                win.buf_name(),
+                line.sep('', theme.win, theme.fill),
+                hl = theme.win,
+                margin = ' ',
+              }
+            end),
+            {
+              line.sep('', theme.tail, theme.fill),
+              { '  ', hl = theme.tail },
+            },
+            hl = theme.fill,
+          }
+        end,
+        -- option = {}, -- setup modules' option,
+      })
+    end,
+  },
 
   'echasnovski/mini.nvim',
-  { 'windwp/nvim-autopairs',                      event = "InsertEnter",                   config = true },
-  { 'akinsho/bufferline.nvim',                    requires = "nvim-tree/nvim-web-devicons" },
+  { 'windwp/nvim-autopairs',                      event = "InsertEnter", config = true },
 
-  { "nvim-telescope/telescope.nvim",              version = "0.1.8",                       dependencies = { 'nvim-lua/plenary.nvim', 'nvim-tree/nvim-web-devicons' } },
+  { "nvim-telescope/telescope.nvim",              version = "0.1.8",     dependencies = { 'nvim-lua/plenary.nvim', 'nvim-tree/nvim-web-devicons' } },
   { "nvim-telescope/telescope-file-browser.nvim", lazy = true },
   -- 'nvim-tree/nvim-tree.lua',
 
@@ -124,6 +160,7 @@ local plugins = {
       keymap = {
         select_prev = { '<Up>', '<C-p>' },
         select_next = { '<Down>', '<C-n>' },
+        accept = { '<cr>' }
       },
       highlight = {
         -- sets the fallback highlight groups to nvim-cmp's highlight groups

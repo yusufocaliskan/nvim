@@ -22,21 +22,21 @@
 -- })
 -- vim.cmd [[ colorscheme catppuccin ]]
 
-require('kanagawa').setup {
-  keywordStyle = { italic = false },
-  commentStyle = { italic = false },
-  statementStyle = { bold = true },
-  transparent = false,
-  background = {
-    --dark = "dragon"
-  }
-}
-vim.cmd [[ colorscheme kanagawa ]]
--- require('onedark').setup {
---   style = 'darker'
+-- require('kanagawa').setup {
+--   keywordStyle = { italic = false },
+--   commentStyle = { italic = false },
+--   statementStyle = { bold = true },
+--   transparent = false,
+--   background = {
+--     --dark = "dragon"
+--   }
 -- }
--- require('onedark').load()
---vim.cmd [[ colorscheme nord ]]
+-- vim.cmd [[ colorscheme kanagawa ]]
+
+require('onedark').setup {
+  style = 'darker'
+}
+require('onedark').load()
 
 -- Available values: 'hard', 'medium'(default), 'soft'
 

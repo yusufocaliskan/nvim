@@ -54,6 +54,7 @@ require('mini.pairs').setup({})
 require('mini.clue').setup({
   window = {
     delay = 0,
+    width = 'auto'
   },
   triggers = {
     -- Leader triggers

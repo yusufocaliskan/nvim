@@ -7,8 +7,8 @@ on_attach = function(client, bufnr)
 
   -- LSP
   vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, named_opts('Rename'))
-  vim.keymap.set('n', '<leader>e', require('telescope.builtin').lsp_dynamic_workspace_symbols,
-    named_opts('LSP Workspace Symbols'))
+  vim.keymap.set('n', 'gs', require('telescope.builtin').lsp_dynamic_workspace_symbols,
+    named_opts('[G]oto [S]ymbols lsp'))
   vim.keymap.set('n', '<leader>k', vim.lsp.buf.hover, named_opts('LSP Hover'))
   vim.keymap.set('n', 'K', vim.lsp.buf.hover, named_opts('LSP Hover'))
   vim.keymap.set('n', 'g.', vim.lsp.buf.code_action, named_opts('[G]oto Edits (.)'))
