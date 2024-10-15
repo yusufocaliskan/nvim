@@ -62,12 +62,13 @@ local capabilities = {}
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
     -- Enable underline, use default values
-    underline = false,
+    underline = true,
     -- Enable virtual text only on Warning or above, override spacing to 2
-    virtual_text = {
-      spacing = 2,
-      min = "Warning",
-    },
+    virtual_text = false,
+    -- virtual_text = {
+    --   spacing = 2,
+    --   min = "Error",
+    -- },
   }
 )
 
@@ -137,23 +138,23 @@ require('lspconfig').lua_ls.setup {
   on_attach = on_attach
 }
 
-require('lspconfig').tailwindcss.setup {
+-- require('lspconfig').tailwindcss.setup {
+--
+-- }
+--
+-- require('lspconfig').terraformls.setup {
+--
+-- }
 
-}
-
-require('lspconfig').terraformls.setup {
-
-}
-
-require('lspconfig').clangd.setup {
-  capabilities = capabilities,
-  on_attach = on_attach
-}
-
-require('lspconfig').zls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach
-}
+-- require('lspconfig').clangd.setup {
+--   capabilities = capabilities,
+--   on_attach = on_attach
+-- }
+--
+-- require('lspconfig').zls.setup {
+--   capabilities = capabilities,
+--   on_attach = on_attach
+-- }
 
 --Format async on Save
 require("lsp-format").setup()

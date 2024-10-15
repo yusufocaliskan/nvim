@@ -1,4 +1,3 @@
-vim.g.mapleader = ' '
 -- Telescope
 
 --local ts_actions = require("telescope.actions")
@@ -15,7 +14,10 @@ require('telescope').setup {
   },
   defaults = {
     mappings = {
-      i = { ["<c-t>"] = ts_open_with_trouble },
+      i = {
+        ["<c-t>"] = ts_open_with_trouble,
+        ["<esc>"] = require('telescope.actions').close
+      },
       n = { ["<c-t>"] = ts_open_with_trouble },
     },
     file_ignore_patterns = { ".git/", "node_modules/" },
@@ -58,6 +60,7 @@ require('mini.clue').setup({
   },
   triggers = {
     -- Leader triggers
+    { mode = 'n', keys = '\\' },
     { mode = 'n', keys = '<Leader>' },
     { mode = 'x', keys = '<Leader>' },
     -- Bracketed
@@ -246,12 +249,11 @@ keymap.set('n', '<leader>hr', '<cmd>source<cr>', named_opts('Source current buff
 -- keymap.set('n', '<leader>hr', '<cmd>lua <c-r>*<cr>', named_opts('Run yanked'))
 keymap.set('n', '<leader>h/', function() ts_grep_from_dir('~/.config/nvim') end, named_opts('Grep config dir'))
 keymap.set('n', '<leader>htc', colemak_toggle, named_opts('Toggle -> Colemak'))
-print('asdfasdfs')
 
 -- Goto
 
-keymap.set('n', 'gn', '<Cmd>bnext<CR>', named_opts('Next Buffer'))
-keymap.set('n', 'gp', '<Cmd>bprev<CR>', named_opts('Previous Buffer'))
+keymap.set('n', 'gn', '<Cmd>tabn<CR>', named_opts('Next Tab'))
+keymap.set('n', 'gp', '<Cmd>tabp<CR>', named_opts('Previous Tab'))
 
 -- Forward / Back
 keymap.set("n", "] ", "o<esc>", named_opts("New line down"))
@@ -260,3 +262,10 @@ keymap.set("n", "]g", "<cmd>Gitsigns next_hunk<cr>", named_opts("Next hunk"))
 keymap.set("n", "[g", "<cmd>Gitsigns prev_hunk<cr>", named_opts("Prev hunk"))
 keymap.set("n", "<leader>z", '<cmd>Gitsigns reset_hunk<CR>')
 keymap.set("n", "<leader>?", require('telescope.builtin').command_history, named_opts("Command history"))
+--
+-- Tabs!
+keymap.set("n", "<leader>tn", "<cmd>tabnew<cr>", named_opts("[N]ew [t]ab"))
+keymap.set("n", "<leader>tx", "<cmd>tabclose<cr>", named_opts("Kill [t]ab"))
+keymap.set("n", "gt", "<cmd>Tabby jump_to_tab<cr>", named_opts("[G]oto [T]ab"))
+
+print('Reloaded maps.lua')

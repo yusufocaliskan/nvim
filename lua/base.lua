@@ -1,5 +1,7 @@
 vim.cmd('autocmd!')
 
+vim.g.mapleader = ' '
+
 vim.keymap.set("n", "R", "<nop>")
 
 -- I can't help it I'm a clipboard man
@@ -22,6 +24,7 @@ vim.wo.number = true
 vim.opt.title = true
 vim.opt.autoindent = true
 vim.opt.hlsearch = false
+vim.opt.incsearch = true
 vim.opt.hidden = true
 vim.opt.errorbells = false
 vim.opt.backup = false
