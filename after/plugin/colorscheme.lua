@@ -31,12 +31,12 @@
 --     --dark = "dragon"
 --   }
 -- }
--- vim.cmd [[ colorscheme kanagawa ]]
+vim.cmd [[ colorscheme everforest ]]
 
-require('onedark').setup {
-  style = 'darker'
-}
-require('onedark').load()
+-- require('onedark').setup {
+--   style = 'darker'
+-- }
+-- require('onedark').load()
 
 -- Available values: 'hard', 'medium'(default), 'soft'
 

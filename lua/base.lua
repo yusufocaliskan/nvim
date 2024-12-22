@@ -2,6 +2,7 @@ vim.cmd('autocmd!')
 
 vim.g.mapleader = ' '
 
+vim.keymap.set({ 'n', 'x' }, 's', '<Nop>')
 vim.keymap.set("n", "R", "<nop>")
 
 -- I can't help it I'm a clipboard man
@@ -49,7 +50,7 @@ vim.opt.wrap = false
 vim.opt.backspace = 'start,eol,indent'
 vim.opt.path:append { '**' } -- Finding files, search into subfolders
 vim.opt.wildignore:append { '*/node_modules/*', '*/target/*' }
-vim.opt.relativenumber = true
+vim.opt.relativenumber = false
 vim.opt.termguicolors = true
 vim.opt.showmode = false
 vim.opt.cursorline = true
@@ -65,3 +66,8 @@ vim.opt.signcolumn = 'yes'
 -- For Neovide
 vim.opt.guifont = { "JetBrainsMonoNL Nerd Font", ":h12" }
 vim.g.neovide_scale_factor = 1.25
+
+vim.cmd [[ au BufRead,BufNewFile *.k1 set syntax=rust ]]
+
+vim.cmd [[ autocmd QuickFixCmdPost [^l]* nested cwindow ]]
+vim.cmd [[ autocmd QuickFixCmdPost    l* nested lwindow ]]

@@ -1,5 +1,13 @@
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufNewFile' }, {
+  pattern = '*.k1',
+  callback = function(event)
+    vim.cmd [[ set filetype=k1 ]]
+    vim.cmd [[ set syntax=rust ]]
+  end,
+})
+
 on_attach = function(client, bufnr)
-  require("lsp-format").on_attach(client)
+  vim.lsp.inlay_hint.enable(true, { 0 })
 
   local function named_opts(desc)
     return { noremap = true, silent = true, desc = desc, buffer = bufnr }
@@ -44,17 +52,16 @@ end
 
 require("illuminate").configure {
   delay = 0,
-
-
   filetypes_denylist = {
     'NvimTree', 'TelescopePrompt'
   },
 
 }
+--vim.cmd [[ hi! IlluminatedWordText  gui=underline]]
+--vim.cmd [[ hi! IlluminatedWordRead  gui=underline]]
+--vim.cmd [[ hi! IlluminatedWordWrite gui=underline]]
+
 vim.keymap.set('n', '<leader>th', require('illuminate').toggle)
-
-vim.opt.makeprg = 'cargo check'
-
 
 -- local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local capabilities = {}
@@ -76,9 +83,15 @@ require('lspconfig')['rust_analyzer'].setup {
   -- Server-specific settings...
   settings = {
     ["rust-analyzer"] = {
+      cargo = {
+        features = { "lsp" }
+      },
       -- enable clippy on save
       checkOnSave = {
         command = "clippy"
+      },
+      diagnostics = {
+        enable = true,
       },
       inlayHints = {
         chainingHints = {
@@ -113,29 +126,40 @@ require('lspconfig').ocamllsp.setup {
 }
 
 
-require('lspconfig').lua_ls.setup {
-  settings = {
-    Lua = {
-      runtime = {
-        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-        version = 'LuaJIT',
-      },
-      diagnostics = {
-        -- Get the language server to recognize the `vim` global
-        globals = { 'vim' },
-      },
-      workspace = {
-        -- Make the server aware of Neovim runtime files
-        library = vim.api.nvim_get_runtime_file("", true),
-      },
-      -- Do not send telemetry data containing a randomized but unique identifier
-      telemetry = {
-        enable = false,
-      },
-    },
-  },
+require 'lspconfig'.lua_ls.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
+  on_init = function(client)
+    if client.workspace_folders then
+      local path = client.workspace_folders[1].name
+      if vim.loop.fs_stat(path .. '/.luarc.json') or vim.loop.fs_stat(path .. '/.luarc.jsonc') then
+        return
+      end
+    end
+
+    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+      runtime = {
+        -- Tell the language server which version of Lua you're using
+        -- (most likely LuaJIT in the case of Neovim)
+        version = 'LuaJIT'
+      },
+      -- Make the server aware of Neovim runtime files
+      workspace = {
+        checkThirdParty = false,
+        library = {
+          vim.env.VIMRUNTIME
+          -- Depending on the usage, you might want to add additional paths here.
+          -- "${3rd}/luv/library"
+          -- "${3rd}/busted/library",
+        }
+        -- or pull in all of 'runtimepath'. NOTE: this is a lot slower and will cause issues when working on your own configuration (see https://github.com/neovim/nvim-lspconfig/issues/3189)
+        -- library = vim.api.nvim_get_runtime_file("", true)
+      }
+    })
+  end,
+  settings = {
+    Lua = {}
+  }
 }
 
 -- require('lspconfig').tailwindcss.setup {
@@ -157,4 +181,4 @@ require('lspconfig').lua_ls.setup {
 -- }
 
 --Format async on Save
-require("lsp-format").setup()
+-- require("lsp-format").setup()

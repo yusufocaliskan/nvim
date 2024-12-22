@@ -16,11 +16,110 @@ vim.opt.rtp:prepend(lazypath)
 local plugins = {
   { 'navarasu/onedark.nvim', lazy = true },
   { "catppuccin/nvim",       name = "catppuccin", lazy = true },
-  { "shaunsingh/nord.nvim",  lazy = true },
-  { "pgdouyon/vim-yin-yang", lazy = true },
-  { 'rebelot/kanagawa.nvim', lazy = false },
+  {
+    "shaunsingh/nord.nvim",
+    lazy = true,
+    -- config = function()
+    --   -- Example config in lua
+    --   vim.g.nord_contrast = true
+    --   vim.g.nord_borders = false
+    --   vim.g.nord_disable_background = false
+    --   vim.g.nord_italic = false
+    --   -- vim.g.nord_uniform_diff_background = true
+    --   vim.g.nord_bold = true
+    --
+    --   -- Load the colorscheme
+    --   require('nord').set()
+    -- end,
+  },
+  {
+    "neanias/everforest-nvim",
+    lazy = false,
+    version = false,
+    config = function()
+      require("everforest").setup {
+        background = "hard",
+        disable_italic_comments = true,
+      }
+    end
+  },
+  -- { "pgdouyon/vim-yin-yang",   lazy = true },
+  -- { 'rebelot/kanagawa.nvim',   lazy = true },
+  {
+    "EdenEast/nightfox.nvim",
+    opts = {
+      palettes = {
+
+      }
+
+    },
+    config = function()
+      vim.cmd("colorscheme nightfox")
+    end
+  },
+  {
+    "j-hui/fidget.nvim",
+    opts = {
+      -- options
+    },
+  },
 
   'echasnovski/mini.nvim',
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+      bigfile = { enabled = true },
+      quickfile = { enabled = false },
+      scratch = { enabled = true },
+      terminal = { enabled = true },
+      git = { enabled = true },
+      lazygit = { enabled = true },
+    },
+    keys = {
+      { "<leader>z",  function() Snacks.zen() end,                desc = "Toggle Zen Mode" },
+      { "<leader>Z",  function() Snacks.zen.zoom() end,           desc = "Toggle Zoom" },
+      { "<leader>.",  function() Snacks.scratch() end,            desc = "Toggle Scratch Buffer" },
+      { "<leader>S",  function() Snacks.scratch.select() end,     desc = "Select Scratch Buffer" },
+      { "<leader>bd", function() Snacks.bufdelete() end,          desc = "[d]elete Buffer" },
+      { "<leader>br", function() Snacks.rename.rename_file() end, desc = "[r]ename File" },
+      { "<leader>gB", function() Snacks.gitbrowse() end,          desc = "Git Browse" },
+      { "<leader>gb", function() Snacks.git.blame_line() end,     desc = "Git Blame Line" },
+      { "<leader>gf", function() Snacks.lazygit.log_file() end,   desc = "Lazygit Current File History" },
+      { "<leader>gg", function() Snacks.lazygit() end,            desc = "Lazygit" },
+      { "<leader>gl", function() Snacks.lazygit.log() end,        desc = "Lazygit Log (cwd)" },
+      { "<c-\\>",     function() Snacks.terminal() end,           desc = "Toggle Terminal" },
+      { "<c-_>",      function() Snacks.terminal() end,           desc = "which_key_ignore" },
+    }
+  },
+
+  {
+    'mikesmithgh/kitty-scrollback.nvim',
+    enabled = true,
+    lazy = true,
+    cmd = { 'KittyScrollbackGenerateKittens', 'KittyScrollbackCheckHealth' },
+    event = { 'User KittyScrollbackLaunch' },
+    version = '*', -- latest stable version, may have breaking changes if major version changed
+    -- version = '^6.0.0', -- pin major version, include fixes and features that do not have breaking changes
+    config = function()
+      require('kitty-scrollback').setup()
+    end,
+  },
+
+  {
+    'nvim-lualine/lualine.nvim',
+    opts = {
+      icons_enabled = false,
+      theme = 'auto',
+      sections = {
+        lualine_x = { 'encoding' },
+      }
+    }
+  },
 
   {
     'stevearc/dressing.nvim',
@@ -30,8 +129,15 @@ local plugins = {
   { 'mg979/vim-visual-multi',                     branch = 'master', lazy = false },
 
   {
+    'windwp/nvim-autopairs',
+    event = "InsertEnter",
+    config = true
+    -- use opts = {} for passing setup options
+    -- this is equivalent to setup({}) function
+  },
+
+  {
     'nanozuki/tabby.nvim',
-    -- dependencies = 'nvim-tree/nvim-web-devicons',
     config = function()
       -- configs...
       local theme = {
@@ -96,18 +202,73 @@ local plugins = {
   },
 
 
-  { "nvim-telescope/telescope.nvim",              version = "0.1.8", dependencies = { 'nvim-lua/plenary.nvim', 'nvim-tree/nvim-web-devicons' } },
+  {
+    "nvim-telescope/telescope.nvim",
+    version = "0.1.8",
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
+    }
+  },
   { "nvim-telescope/telescope-file-browser.nvim", lazy = true },
-  -- 'nvim-tree/nvim-tree.lua',
 
   {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
+    enabled = false,
     lazy = true,
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
       'nvim-treesitter/nvim-treesitter-context',
-    }
+    },
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        -- Add languages to be installed here that you want installed for treesitter
+        ensure_installed = { 'c', 'cpp', 'lua', 'python', 'rust', 'typescript', 'sql', 'scala', 'zig', 'vim', 'vimdoc' },
+
+        highlight = { enable = true },
+        indent = { enable = true },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = '<c-=>',
+            node_incremental = '<c-=>',
+            scope_incremental = '<c-s>',
+            node_decremental = '<c-->',
+          },
+        },
+        textobjects = {
+          select = {
+            enable = true,
+            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+            keymaps = {
+              -- You can use the capture groups defined in textobjects.scm
+              -- For now i prefer the text based ones since Scala treesitter is broken
+              -- ['aa'] = '@parameter.outer',
+              -- ['ia'] = '@parameter.inner',
+              ['af'] = '@function.outer',
+              ['if'] = '@function.inner',
+              ['ac'] = '@class.outer',
+              ['ic'] = '@class.inner',
+            },
+          },
+        },
+      }
+
+      require('treesitter-context').setup {
+        enable = true,            -- Enable this plugin (Can be enabled/disabled later via commands)
+        max_lines = 3,            -- How many lines the window should span. Values <= 0 mean no limit.
+        min_window_height = 0,    -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+        line_numbers = true,
+        multiline_threshold = 20, -- Maximum number of lines to collapse for a single context line
+        trim_scope = 'outer',     -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+        mode = 'topline',         -- Line used to calculate context. Choices: 'cursor', 'topline'
+        -- Separator between context and content. Should be a single character string, like '-'.
+        -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+        separator = nil,
+        zindex = 20, -- The Z-index of the context window
+      }
+    end
   },
 
   'lewis6991/gitsigns.nvim',
@@ -142,12 +303,34 @@ local plugins = {
       }
     },
     keys = {
-      { "<leader>1", "<cmd>lua require('oil').toggle_float()<cr>", desc = "Open file browser" }
+      { "-", "<cmd>lua require('oil').toggle_float()<cr>", desc = "Open file browser" }
     },
   },
 
-  { 'neovim/nvim-lspconfig',  lazy = true },
-  'lukas-reineke/lsp-format.nvim',
+  {
+    'neovim/nvim-lspconfig',
+    lazy = true,
+    config = function()
+      vim.api.nvim_create_autocmd('LspAttach', {
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if not client then return end
+          if client.supports_method('textDocument/formatting') then
+            vim.api.nvim_create_autocmd('BufWritePre', {
+              buffer = args.buf,
+              callback = function()
+                vim.lsp.buf.format({
+                  bufnr = args.buf,
+                  id = client.id,
+                  async = false
+                })
+              end
+            })
+          end
+        end
+      })
+    end
+  },
   'rrethy/vim-illuminate',
   {
     'folke/trouble.nvim',
@@ -158,18 +341,11 @@ local plugins = {
     keys = {
       {
         "<leader>d",
-        "<cmd>Trouble diagnostics toggle filter.severity=vim.diagnostic.severity.ERROR<cr>",
+        "<cmd>Trouble diagnostics toggle filter.severity=vim.diagnostic.severity.ERROR focus=true<cr>",
         desc =
         "Buffer [D]iagnostics (Trouble)"
       }
     }
-  },
-  {
-    'akinsho/toggleterm.nvim',
-    version = '*',
-    opts = {
-      open_mapping = [[<c-\>]]
-    },
   },
   {
     'stevearc/overseer.nvim',
@@ -184,7 +360,6 @@ local plugins = {
     config = function()
       local overseer = require("overseer")
       overseer.setup({
-        strategy = "toggleterm",
         task_list = {
           direction = "left",
           bindings = {
@@ -224,53 +399,80 @@ local plugins = {
     -- OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
     -- build = 'cargo build --release',
 
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
     opts = {
       keymap = {
-        select_prev = { '<Up>', '<C-p>' },
-        select_next = { '<Down>', '<C-n>' },
-        accept = { '<cr>' }
+        preset = 'enter'
       },
-      highlight = {
-        -- sets the fallback highlight groups to nvim-cmp's highlight groups
-        -- useful for when your theme doesn't support blink.cmp
-        -- will be removed in a future release, assuming themes add support
+      appearance = {
+        -- Sets the fallback highlight groups to nvim-cmp's highlight groups
+        -- Useful for when your theme doesn't support blink.cmp
+        -- will be removed in a future release
         use_nvim_cmp_as_default = true,
+        -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+        -- Adjusts spacing to ensure icons are aligned
+        nerd_font_variant = 'mono'
       },
-      -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-      -- adjusts spacing to ensure icons are aligned
-      nerd_font_variant = 'normal',
+      completion = {
+        accept = { auto_brackets = { enabled = true } },
+        ghost_text = { enabled = true },
+        menu = {
+          auto_show = true,
+        },
+      },
+      sources = {
+        default = { "lsp", "path" },
+        cmdline = {}
+      },
 
-      -- experimental auto-brackets support
-      accept = { auto_brackets = { enabled = false } },
-
-      -- experimental signature help support
-      trigger = { signature_help = { enabled = true } }
+      signature = { enabled = true }
     }
   },
-  -- {
-  --   'hrsh7th/nvim-cmp',
-  --   dependencies = {
-  --     'L3MON4D3/LuaSnip',
-  --     'saadparwaiz1/cmp_luasnip',
-  --     'hrsh7th/cmp-nvim-lsp',
-  --     'hrsh7th/cmp-buffer',
-  --     'hrsh7th/cmp-cmdline',
-  --   }
-  -- },
-  { 'scalameta/nvim-metals',  dependencies = { 'nvim-lua/plenary.nvim' }, lazy = true },
-  { 'zbirenbaum/copilot.lua', lazy = true },
+  { 'scalameta/nvim-metals', dependencies = { 'nvim-lua/plenary.nvim' }, lazy = true },
+
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      require("copilot").setup({
+        suggestion = {
+          enabled = true,
+          auto_trigger = false,
+          keymap = {
+            accept = "<C-CR>",
+            accept_word = false,
+            accept_line = false,
+            next = "<tab>",
+            prev = false,
+            dismiss = "<C-e>",
+          }
+        }
+      })
+    end,
+  },
+
   {
     "folke/flash.nvim",
     event = "VeryLazy",
     ---@type Flash.Config
-    opts = {},
+    opts = {
+      highlight = {
+        backdrop = false,
+        matches = false,
+      },
+      label = {
+        style = "overlay"
+      }
+    },
     -- stylua: ignore
     keys = {
-      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
-      { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
-      { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
-      { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-      { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
+      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,   desc = "Flash" },
+      { "<c-s>", mode = { "c" },           function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+      -- { "S",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
+      -- { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
+      -- { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
     },
   }
 
