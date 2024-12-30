@@ -58,6 +58,17 @@ local plugins = {
     end
   },
   {
+    "folke/lazydev.nvim",
+    ft = "lua", -- only load on lua files
+    opts = {
+      library = {
+        -- See the configuration section for more details
+        -- Load luvit types when the `vim.uv` word is found
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
+  {
     "j-hui/fidget.nvim",
     opts = {
       -- options
@@ -70,9 +81,6 @@ local plugins = {
     priority = 1000,
     lazy = false,
     opts = {
-      -- your configuration comes here
-      -- or leave it empty to use the default settings
-      -- refer to the configuration section below
       bigfile = { enabled = true },
       quickfile = { enabled = false },
       scratch = { enabled = true },
@@ -282,6 +290,7 @@ local plugins = {
   {
     'stevearc/oil.nvim',
     lazy = false,
+    enabled = true,
     opts = {
       columns = {
         "size", "mtime"
@@ -422,7 +431,15 @@ local plugins = {
         },
       },
       sources = {
-        default = { "lsp", "path" },
+        default = { "lazydev", "lsp", "path" },
+        providers = {
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+            -- make lazydev completions top priority (see `:h blink.cmp`)
+            score_offset = 100,
+          },
+        },
         cmdline = {}
       },
 

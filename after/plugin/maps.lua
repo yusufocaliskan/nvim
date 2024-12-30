@@ -129,6 +129,10 @@ require('mini.clue').setup({
   },
 })
 
+--require('mini.files').setup {
+--
+--}
+
 -- Gutter Symbols
 local signs = {
   Error = "E",

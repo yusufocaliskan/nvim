@@ -63,9 +63,11 @@ vim.opt.formatoptions:append { 'r' }
 
 vim.opt.signcolumn = 'yes'
 
+vim.opt.grepprg = "rg --type-add 'k1:*.k1' --vimgrep --smart-case"
+
 -- For Neovide
 vim.opt.guifont = { "JetBrainsMonoNL Nerd Font", ":h12" }
-vim.g.neovide_scale_factor = 1.25
+vim.g.neovide_scale_factor = 1.5
 
 vim.cmd [[ au BufRead,BufNewFile *.k1 set syntax=rust ]]
 

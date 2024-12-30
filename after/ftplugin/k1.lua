@@ -1,4 +1,4 @@
-vim.opt.grepprg = "rg --type-add 'k1:*.k1' --vimgrep -uu"
+vim.opt.grepprg = "rg --type-add 'k2:*.k1' --vimgrep"
 
 local stdlib_dir = "/Users/knix/dev/k1/stdlib"
 local lsp_binary = "/Users/knix/dev/k1/target/debug/lsp"
@@ -7,16 +7,45 @@ local lsp_binary = "/Users/knix/dev/k1/target/debug/lsp"
 --   update_in_insert = true
 -- })
 
-vim.lsp.start({
-  name = 'k1-lsp',
-  cmd = { lsp_binary },
-  cmd_env = { K1_LIB_DIR = stdlib_dir, RUST_BACKTRACE = '1' },
-  -- root_dir = vim.fs.dirname(vim.buf),
-  root_dir = vim.fn.getcwd(), -- Use PWD as project root dir.
-})
+function Start_K1(reuse)
+  -- vim.cmd [[ colorscheme carbonfox  ]]
+  local opts = nil
+  if reuse then
+    opts = {
+      reuse_client = function(client, config)
+        return false
+      end
+    }
+  end
+  vim.lsp.start({
+    name = 'k1-lsp',
+    cmd = { lsp_binary },
+    cmd_env = { K1_LIB_DIR = stdlib_dir, RUST_BACKTRACE = '1' },
+    -- root_dir = vim.fs.dirname(vim.buf),
+    root_dir = vim.fn.getcwd(), -- Use PWD as project root dir.
+  }, opts)
+end
+
+Start_K1()
+
 local function named_opts(desc)
   return { noremap = true, silent = true, desc = desc }
 end
+
+vim.api.nvim_create_user_command("K1reload", function(args)
+  local c = vim.system({ './build_lsp.sh' }):wait()
+  if c.code ~= 0 then
+    vim.cmd.echomsg('Failed')
+    return
+  end
+  local k1_clients = vim.lsp.get_clients({ name == 'k1-lsp' })
+  for i, client in ipairs(k1_clients) do
+    -- Only detaches the current buffer, good enough for now
+    vim.lsp.buf_detach_client(0, client.id)
+  end
+  vim.lsp.stop_client(k1_clients)
+  Start_K1()
+end, { desc = "Re-compile and reload K1 lsp server" })
 
 -- LSP
 vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, named_opts('Rename'))
