@@ -209,11 +209,11 @@ local plugins = {
     config = function()
       require('auto-session').setup({
         log_level = 'info',
-        auto_session_enable_last_session = true,  -- Enable automatic session loading
+        auto_session_enable_last_session = false,  -- Disable automatic last session loading
         auto_session_root_dir = vim.fn.stdpath('data') .. '/sessions/',
         auto_session_enabled = true,
         auto_save_enabled = true,
-        auto_restore_enabled = true,
+        auto_restore_enabled = false,  -- We'll handle this manually
         auto_session_create_enabled = true,  -- Automatically create sessions
 
         -- Suppress directories where we don't want sessions
@@ -282,7 +282,7 @@ local plugins = {
         },
       })
 
-      -- Auto-restore session on startup
+      -- Project-specific session restore on startup
       vim.api.nvim_create_autocmd({ 'VimEnter' }, {
         nested = true,
         callback = function()
@@ -290,8 +290,20 @@ local plugins = {
           if vim.fn.argc() == 0 then
             local cwd = vim.fn.getcwd()
             if cwd and cwd ~= vim.fn.expand('~') and cwd ~= '/' then
+              -- Try to restore session, only if it exists
               vim.schedule(function()
-                require('auto-session').RestoreSession()
+                local success, err = pcall(function()
+                  require('auto-session').RestoreSession()
+                end)
+
+                if success then
+                  print("Restored session for: " .. vim.fn.fnamemodify(cwd, ':t'))
+                else
+                  -- Session doesn't exist or failed to restore
+                  if err and not err:match("No session found") then
+                    print("No previous session found for: " .. vim.fn.fnamemodify(cwd, ':t'))
+                  end
+                end
               end)
             end
           end

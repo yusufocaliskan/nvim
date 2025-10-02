@@ -294,18 +294,23 @@ local function toggle_terminal(direction, command)
     else
       -- Terminal exists but hidden, show it
       if direction == "vsplit" then
-        vim.cmd("vsplit")
-      else
-        vim.cmd("split")
+        vim.cmd("botright vsplit")
+      elseif direction == "split" then
+        vim.cmd("botright split")
+      elseif direction == "fullscreen" then
+        vim.cmd("tabnew")
       end
       vim.api.nvim_win_set_buf(0, terminal_buffers[key].buf)
     end
   else
     -- Create new terminal
     if direction == "vsplit" then
-      vim.cmd("vsplit")
-    else
-      vim.cmd("split")
+      vim.cmd("botright vsplit")
+    elseif direction == "split" then
+      vim.cmd("botright split")
+    elseif direction == "fullscreen" then
+      -- Full screen terminal option
+      vim.cmd("tabnew")
     end
 
     if command then
@@ -322,11 +327,10 @@ local function toggle_terminal(direction, command)
   end
 end
 
-vim.keymap.set('n', '<leader>tt', function() toggle_terminal("vsplit") end, named_opts('Toggle Terminal'))
- vim.keymap.set('n', '<leader>tv', function() toggle_terminal("vsplit") end, named_opts('Toggle Vertical Terminal'))
+vim.keymap.set('n', '<leader>tt', function() toggle_terminal("fullscreen") end, named_opts('Toggle Fullscreen Terminal'))
+vim.keymap.set('n', '<leader>tv', function() toggle_terminal("vsplit") end, named_opts('Toggle Vertical Terminal'))
 vim.keymap.set('n', '<leader>th', function() toggle_terminal("split") end, named_opts('Toggle Horizontal Terminal'))
 vim.keymap.set('n', '<leader>tc', function() toggle_terminal("vsplit", "claude") end, named_opts('Toggle Vertical Terminal with Claude'))
-vim.keymap.set('n', '<leader>tt', function() toggle_terminal("vsplit") end, named_opts('Toggle Terminal'))
 
 -- vim.keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('[O]pen config dir'))
 -- vim.keymap.set('n', '<leader>hs', '<cmd>source %<cr>', named_opts('Source current buffer'))
