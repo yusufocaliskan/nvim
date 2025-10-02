@@ -1,7 +1,7 @@
 -- Telescope
 
 --local ts_actions = require("telescope.actions")
---local ts_open_with_trouble = require("trouble.sources.telescope").open
+local ts_open_with_trouble = require("trouble.sources.telescope").open
 -- Use this to add more results without clearing the trouble list
 --local ts_add_to_trouble = require("trouble.sources.telescope").add
 
@@ -19,12 +19,10 @@ require('telescope').setup {
   defaults = {
     mappings = {
       i = {
-        --["<c-t>"] = ts_open_with_trouble,
+        ["<c-t>"] = ts_open_with_trouble,
         ["<esc>"] = require('telescope.actions').close
       },
-      n = {
-        --["<c-t>"] = ts_open_with_trouble
-      },
+      n = { ["<c-t>"] = ts_open_with_trouble },
     },
     file_ignore_patterns = { ".git/", "node_modules/" },
     layout_config = {
@@ -279,54 +277,8 @@ function edit_neovim()
   }
 end
 
--- Terminal management with hide/show functionality
-local terminal_buffers = {}
-
-local function toggle_terminal(direction, command)
-  local key = direction .. (command or "")
-
-  if terminal_buffers[key] and vim.api.nvim_buf_is_valid(terminal_buffers[key].buf) then
-    -- Terminal exists, check if it's visible
-    local wins = vim.fn.win_findbuf(terminal_buffers[key].buf)
-    if #wins > 0 then
-      -- Terminal is visible, hide it
-      vim.api.nvim_win_close(wins[1], false)
-    else
-      -- Terminal exists but hidden, show it
-      if direction == "vsplit" then
-        vim.cmd("vsplit")
-      else
-        vim.cmd("split")
-      end
-      vim.api.nvim_win_set_buf(0, terminal_buffers[key].buf)
-    end
-  else
-    -- Create new terminal
-    if direction == "vsplit" then
-      vim.cmd("vsplit")
-    else
-      vim.cmd("split")
-    end
-
-    if command then
-      vim.cmd("terminal " .. command)
-    else
-      vim.cmd("terminal")
-    end
-
-    terminal_buffers[key] = {
-      buf = vim.api.nvim_get_current_buf(),
-      direction = direction,
-      command = command
-    }
-  end
-end
-
-vim.keymap.set('n', '<leader>tt', function() toggle_terminal("vsplit") end, named_opts('Toggle Terminal'))
- vim.keymap.set('n', '<leader>tv', function() toggle_terminal("vsplit") end, named_opts('Toggle Vertical Terminal'))
-vim.keymap.set('n', '<leader>th', function() toggle_terminal("split") end, named_opts('Toggle Horizontal Terminal'))
-vim.keymap.set('n', '<leader>tc', function() toggle_terminal("vsplit", "claude") end, named_opts('Toggle Vertical Terminal with Claude'))
-vim.keymap.set('n', '<leader>tt', function() toggle_terminal("vsplit") end, named_opts('Toggle Terminal'))
+-- vim.keymap.set('n', '<leader>vt', 'vsplit | terminal<CR>', named_opts('Vertical Terminal'))
+-- vim.keymap.set('n', '<leader>ht', 'split | terminal<CR>', named_opts('Horizontal Trrminal'))
 
 -- vim.keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('[O]pen config dir'))
 -- vim.keymap.set('n', '<leader>hs', '<cmd>source %<cr>', named_opts('Source current buffer'))

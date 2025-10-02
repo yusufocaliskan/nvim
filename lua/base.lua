@@ -16,7 +16,7 @@ vim.opt.encoding = 'utf-8'
 vim.opt.fileencoding = 'utf-8'
 
 vim.opt.showtabline = 2
-vim.opt.sessionoptions = 'curdir,folds,globals,help,tabpages,terminal,winsize'
+vim.opt.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions'
 
 vim.opt.completeopt = menu, menuone, noselect
 
@@ -24,7 +24,7 @@ vim.wo.number = true
 
 vim.opt.title = true
 vim.opt.autoindent = true
-vim.opt.hlsearch = false
+vim.opt.hlsearch = true
 vim.opt.incsearch = true
 vim.opt.hidden = true
 vim.opt.errorbells = false
@@ -73,3 +73,4 @@ vim.cmd [[ au BufRead,BufNewFile *.k1 set syntax=rust ]]
 
 vim.cmd [[ autocmd QuickFixCmdPost [^l]* nested cwindow ]]
 vim.cmd [[ autocmd QuickFixCmdPost    l* nested lwindow ]]
+

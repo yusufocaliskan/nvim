@@ -1,0 +1,139 @@
+-- VSCode-style keymaps for Neovim
+-- This file adds VSCode-compatible keybindings to your existing Neovim setup
+
+local function named_opts(desc)
+  return { noremap = true, silent = true, desc = desc }
+end
+
+-- File operations (VSCode: Ctrl+N, Ctrl+O, Ctrl+S, Ctrl+W)
+vim.keymap.set('n', '<C-n>', '<cmd>enew<cr>', named_opts('New file'))
+vim.keymap.set('n', '<C-o>', '<cmd>Telescope find_files<cr>', named_opts('Open file'))
+vim.keymap.set('n', '<C-s>', '<cmd>w<cr>', named_opts('Save file'))
+vim.keymap.set('i', '<C-s>', '<Esc><cmd>w<cr>a', named_opts('Save file (insert mode)'))
+vim.keymap.set('n', '<C-w>', '<cmd>bd<cr>', named_opts('Close buffer'))
+
+-- Quick Open (VSCode: Ctrl+P)
+vim.keymap.set('n', '<C-p>', '<cmd>Telescope find_files<cr>', named_opts('Quick Open'))
+
+-- Command Palette (VSCode: Ctrl+Shift+P)
+vim.keymap.set('n', '<C-S-p>', '<cmd>Telescope commands<cr>', named_opts('Command Palette'))
+
+-- Find in Files (VSCode: Ctrl+Shift+F)
+vim.keymap.set('n', '<C-S-f>', '<cmd>Telescope live_grep<cr>', named_opts('Find in Files'))
+
+-- Go to Definition (VSCode: F12)
+vim.keymap.set('n', '<F12>', '<cmd>lua vim.lsp.buf.definition()<cr>', named_opts('Go to Definition'))
+
+-- Go to References (VSCode: Shift+F12)
+vim.keymap.set('n', '<S-F12>', '<cmd>Telescope lsp_references<cr>', named_opts('Go to References'))
+
+-- Rename Symbol (VSCode: F2)
+vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', named_opts('Rename Symbol'))
+
+-- Format Document (VSCode: Shift+Alt+F)
+vim.keymap.set('n', '<S-A-f>', '<cmd>lua vim.lsp.buf.format()<cr>', named_opts('Format Document'))
+vim.keymap.set('v', '<S-A-f>', '<cmd>lua vim.lsp.buf.format()<cr>', named_opts('Format Selection'))
+
+-- Toggle Comment (VSCode: Ctrl+/)
+vim.keymap.set('n', '<C-/>', '<cmd>lua require("mini.comment").toggle_lines(vim.v.count1)<cr>', named_opts('Toggle Comment'))
+vim.keymap.set('v', '<C-/>', '<cmd>lua require("mini.comment").toggle_lines(vim.v.count1)<cr>', named_opts('Toggle Comment'))
+
+-- Duplicate Line (VSCode: Shift+Alt+Down/Up)
+vim.keymap.set('n', '<S-A-Down>', '<cmd>t.<cr>', named_opts('Duplicate Line Down'))
+vim.keymap.set('n', '<S-A-Up>', '<cmd>t-1<cr>', named_opts('Duplicate Line Up'))
+
+-- Move Line Up/Down (VSCode: Alt+Up/Down)
+vim.keymap.set('n', '<A-Up>', '<cmd>move .-2<cr>', named_opts('Move Line Up'))
+vim.keymap.set('n', '<A-Down>', '<cmd>move .+1<cr>', named_opts('Move Line Down'))
+vim.keymap.set('v', '<A-Up>', ":move '<-2<cr>gv", named_opts('Move Lines Up'))
+vim.keymap.set('v', '<A-Down>', ":move '>+1<cr>gv", named_opts('Move Lines Down'))
+
+-- Multi-cursor (VSCode: Ctrl+D, Ctrl+Shift+L)
+-- Note: Using vim-visual-multi plugin for this
+vim.keymap.set('n', '<C-d>', '<cmd>call vm#commands#add_cursor_down(0, v:count1)<cr>', named_opts('Add Cursor Down'))
+vim.keymap.set('n', '<C-S-l>', '<cmd>call vm#commands#find_all(0, 1)<cr>', named_opts('Select All Occurrences'))
+
+-- Go to Line (VSCode: Ctrl+G)
+vim.keymap.set('n', '<C-g>', '<cmd>Telescope current_buffer_fuzzy_find<cr>', named_opts('Go to Line'))
+
+-- Toggle Sidebar (VSCode: Ctrl+B)
+vim.keymap.set('n', '<C-b>', '<cmd>Oil<cr>', named_opts('Toggle File Explorer'))
+
+-- Toggle Terminal (VSCode: Ctrl+`)
+vim.keymap.set('n', '<C-`>', '<cmd>lua Snacks.terminal()<cr>', named_opts('Toggle Terminal'))
+
+-- Zen Mode (VSCode: Ctrl+K Z)
+vim.keymap.set('n', '<C-k>z', '<cmd>lua Snacks.zen()<cr>', named_opts('Toggle Zen Mode'))
+
+-- Split Editor (VSCode: Ctrl+\)
+vim.keymap.set('n', '<C-\\>', '<cmd>vsplit<cr>', named_opts('Split Editor Vertically'))
+
+-- Close Editor (VSCode: Ctrl+W)
+vim.keymap.set('n', '<C-w>', '<cmd>bd<cr>', named_opts('Close Editor'))
+
+-- Navigate Tabs (VSCode: Ctrl+Tab, Ctrl+Shift+Tab)
+vim.keymap.set('n', '<C-Tab>', '<cmd>BufferNext<cr>', named_opts('Next Tab'))
+vim.keymap.set('n', '<C-S-Tab>', '<cmd>BufferPrevious<cr>', named_opts('Previous Tab'))
+
+-- Show All Symbols (VSCode: Ctrl+T)
+vim.keymap.set('n', '<C-t>', '<cmd>Telescope lsp_workspace_symbols<cr>', named_opts('Show All Symbols'))
+
+-- Show Problems (VSCode: Ctrl+Shift+M)
+vim.keymap.set('n', '<C-S-m>', '<cmd>Trouble diagnostics toggle<cr>', named_opts('Show Problems'))
+
+-- Peek Definition (VSCode: Alt+F12)
+vim.keymap.set('n', '<A-F12>', '<cmd>lua vim.lsp.buf.peek_definition()<cr>', named_opts('Peek Definition'))
+
+-- Show Hover (VSCode: Ctrl+K Ctrl+I)
+vim.keymap.set('n', '<C-k><C-i>', '<cmd>lua vim.lsp.buf.hover()<cr>', named_opts('Show Hover'))
+
+-- Quick Fix (VSCode: Ctrl+.)
+vim.keymap.set('n', '<C-.>', '<cmd>lua vim.lsp.buf.code_action()<cr>', named_opts('Quick Fix'))
+
+-- Navigate to Next/Previous Error (VSCode: F8, Shift+F8)
+vim.keymap.set('n', '<F8>', '<cmd>lua vim.diagnostic.goto_next({severity = vim.diagnostic.severity.ERROR})<cr>', named_opts('Next Error'))
+vim.keymap.set('n', '<S-F8>', '<cmd>lua vim.diagnostic.goto_prev({severity = vim.diagnostic.severity.ERROR})<cr>', named_opts('Previous Error'))
+
+-- Folding (VSCode: Ctrl+Shift+[, Ctrl+Shift+])
+vim.keymap.set('n', '<C-S-[>', 'zc', named_opts('Fold'))
+vim.keymap.set('n', '<C-S-]>', 'zo', named_opts('Unfold'))
+
+-- Select All (VSCode: Ctrl+A)
+vim.keymap.set('n', '<C-a>', 'ggVG', named_opts('Select All'))
+
+-- Undo/Redo (VSCode: Ctrl+Z, Ctrl+Y)
+vim.keymap.set('n', '<C-z>', 'u', named_opts('Undo'))
+vim.keymap.set('n', '<C-y>', '<C-r>', named_opts('Redo'))
+
+-- Copy/Cut/Paste (VSCode: Ctrl+C, Ctrl+X, Ctrl+V)
+vim.keymap.set('v', '<C-c>', '"+y', named_opts('Copy'))
+vim.keymap.set('v', '<C-x>', '"+d', named_opts('Cut'))
+vim.keymap.set('n', '<C-v>', '"+p', named_opts('Paste'))
+vim.keymap.set('i', '<C-v>', '<C-r>+', named_opts('Paste (insert mode)'))
+
+-- Find and Replace (VSCode: Ctrl+H)
+vim.keymap.set('n', '<C-h>', '<cmd>lua vim.ui.input({prompt = "Replace: "}, function(input) if input then vim.cmd("%%s/" .. input .. "//gc") end end)<cr>', named_opts('Find and Replace'))
+
+-- Navigate Back/Forward (VSCode: Alt+Left, Alt+Right)
+vim.keymap.set('n', '<A-Left>', '<C-o>', named_opts('Go Back'))
+vim.keymap.set('n', '<A-Right>', '<C-i>', named_opts('Go Forward'))
+
+-- Toggle Word Wrap (VSCode: Alt+Z)
+vim.keymap.set('n', '<A-z>', '<cmd>set wrap!<cr>', named_opts('Toggle Word Wrap'))
+
+-- Toggle Minimap (VSCode: Ctrl+Shift+M) - Using diagnostics as closest equivalent
+vim.keymap.set('n', '<C-S-e>', '<cmd>Trouble diagnostics toggle<cr>', named_opts('Toggle Diagnostics'))
+
+-- Show Extensions (VSCode: Ctrl+Shift+X) - Using lazy plugin manager
+vim.keymap.set('n', '<C-S-x>', '<cmd>Lazy<cr>', named_opts('Show Plugins'))
+
+-- Show Source Control (VSCode: Ctrl+Shift+G) - Using lazygit
+vim.keymap.set('n', '<C-S-g>', '<cmd>lua Snacks.lazygit()<cr>', named_opts('Show Source Control'))
+
+-- Show Output (VSCode: Ctrl+Shift+U) - Using terminal
+vim.keymap.set('n', '<C-S-u>', '<cmd>lua Snacks.terminal()<cr>', named_opts('Show Output'))
+
+-- Show Debug Console (VSCode: Ctrl+Shift+Y) - Using trouble
+vim.keymap.set('n', '<C-S-y>', '<cmd>Trouble diagnostics toggle<cr>', named_opts('Show Debug Console'))
+
+print("VSCode-style keymaps loaded!")
