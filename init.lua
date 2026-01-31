@@ -81,12 +81,11 @@ local plugins = {
       },
     },
   },
-  {
-    "j-hui/fidget.nvim",
-    opts = {
-      -- options
-    },
-  },
+  -- Disabled: fidget.nvim (LSP progress animations - performance)
+  -- {
+  --   "j-hui/fidget.nvim",
+  --   opts = {},
+  -- },
 
   'echasnovski/mini.nvim',
   {
@@ -496,7 +495,7 @@ local plugins = {
       })
     end
   },
-  'rrethy/vim-illuminate',
+  -- 'rrethy/vim-illuminate', -- Duplicate: defined below at line 1297
   {
     'folke/trouble.nvim',
     cmd = "Trouble",
@@ -1151,13 +1150,13 @@ local plugins = {
     end,
   },
 
-  -- Indent blankline: Show indentation guides
+  -- Indent blankline: Show indentation guides (scope disabled for performance)
   {
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
     opts = {
       indent = { char = '│' },
-      scope = { enabled = true },
+      scope = { enabled = false },  -- Disable scope animation for performance
     },
   },
 
@@ -1168,7 +1167,7 @@ local plugins = {
     opts = {},
   },
 
-  -- Noice: Better UI for messages, cmdline, popupmenu
+  -- Noice: Better UI for messages, cmdline, popupmenu (animations disabled)
   {
     'folke/noice.nvim',
     event = 'VeryLazy',
@@ -1177,6 +1176,10 @@ local plugins = {
       'rcarriga/nvim-notify',
     },
     opts = {
+      -- Disable animations for performance
+      animate = {
+        enabled = false,
+      },
       routes = {
         -- Yank mesajlarını gizle
         { filter = { event = 'msg_show', find = 'yanked' }, opts = { skip = true } },
@@ -1190,6 +1193,8 @@ local plugins = {
           ['vim.lsp.util.stylize_markdown'] = true,
           ['cmp.entry.get_documentation'] = true,
         },
+        -- Disable LSP progress for performance (use native)
+        progress = { enabled = false },
       },
       presets = {
         bottom_search = true,
@@ -1299,8 +1304,10 @@ local plugins = {
     event = 'BufReadPost',
     config = function()
       require('illuminate').configure({
-        delay = 100,
-        filetypes_denylist = { 'neo-tree', 'Trouble', 'alpha' },
+        delay = 200,  -- Increased delay for performance
+        filetypes_denylist = { 'neo-tree', 'Trouble', 'alpha', 'oil', 'TelescopePrompt' },
+        large_file_cutoff = 2000,  -- Disable for large files
+        min_count_to_highlight = 2,
       })
     end,
   },

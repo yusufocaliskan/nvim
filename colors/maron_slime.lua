@@ -9,77 +9,78 @@ vim.o.termguicolors = true
 vim.g.colors_name = 'maron_slime'
 
 local c = {
-  -- Base colors
-  bg = '#1b2020',
-  bg_dark = '#161919',
-  bg_light = '#252b2b',
-  bg_visual = '#405c50',
+  -- Base colors (slightly lighter background for better contrast)
+  bg = '#1c2121',
+  bg_dark = '#171a1a',
+  bg_light = '#282f2f',
+  bg_visual = '#3d5c50',
   bg_selection = '#3d3040',
 
-  fg = '#e0e0e0',
-  fg_dark = '#9ca2a0',
-  fg_gutter = '#5e7373',
+  -- Foreground (brighter for better readability)
+  fg = '#e8e8e8',
+  fg_dark = '#b0b5b3',  -- Brighter secondary text
+  fg_gutter = '#6a8080',
 
-  -- Accent
-  green = '#8bac78',
-  green_light = '#AEC199',
-  green_dark = '#7e935a',
+  -- Accent (more saturated greens)
+  green = '#98bf80',
+  green_light = '#b8d0a0',
+  green_dark = '#8aa55e',
 
-  -- Syntax
-  comment = '#6E7573',
-  string = '#8CAEC1',
-  func = '#E0BA7D',
-  keyword = '#9FB3C2',
-  keyword_ctrl = '#D8D29A',
-  type = '#D88F56',
-  type_alt = '#DF7F37',
-  number = '#B081B9',
-  variable = '#BE9296',
-  variable_alt = '#B5919F',
-  class = '#D6C05D',
-  constant = '#9876AA',
-  boolean = '#AB6767',
-  operator = '#B4B4B4',
+  -- Syntax (more saturated/vibrant colors like VS Code)
+  comment = '#7a8583',  -- Slightly brighter comments
+  string = '#9ac0d3',   -- More vibrant string color
+  func = '#f0c87d',     -- Brighter function color
+  keyword = '#a8c0d0',  -- Slightly brighter keywords
+  keyword_ctrl = '#e5de9a',  -- Brighter control keywords
+  type = '#e89a5e',     -- More vibrant type color
+  type_alt = '#f08040',
+  number = '#c090c8',   -- Brighter numbers
+  variable = '#d0a0a4', -- Brighter variables
+  variable_alt = '#c8a0b0',
+  class = '#e8d060',    -- Brighter class names
+  constant = '#a888bb', -- Brighter constants
+  boolean = '#c07070',  -- Brighter booleans
+  operator = '#c8c8c8', -- Brighter operators
 
   -- UI
-  cursor = '#8bac78',
-  cursor_line = '#151818',
-  line_nr = '#5e7373',
-  line_nr_active = '#8bac78',
+  cursor = '#98bf80',
+  cursor_line = '#161919',
+  line_nr = '#6a8080',
+  line_nr_active = '#98bf80',
 
-  -- Brackets
-  bracket1 = '#80b5b3',
-  bracket2 = '#fff099',
-  bracket3 = '#8bac78',
-  bracket4 = '#6d9cbe',
-  bracket5 = '#b081b9',
-  bracket6 = '#BF616A',
+  -- Brackets (more vibrant)
+  bracket1 = '#90c8c5',
+  bracket2 = '#fff599',
+  bracket3 = '#98bf80',
+  bracket4 = '#80b0d0',
+  bracket5 = '#c090c8',
+  bracket6 = '#d07078',
 
   -- Git
-  git_add = '#8bac78',
-  git_change = '#375d4f',
-  git_delete = '#c05557',
-  git_modified = '#b2af87',
-  git_untracked = '#7e935a',
+  git_add = '#98bf80',
+  git_change = '#406858',
+  git_delete = '#d06060',
+  git_modified = '#c0bc90',
+  git_untracked = '#8aa55e',
 
-  -- Diagnostics
-  error = '#b64e4e',
-  warning = '#91b147',
-  info = '#6d9cbe',
-  hint = '#8bac78',
+  -- Diagnostics (more visible)
+  error = '#d05858',
+  warning = '#a0c050',
+  info = '#80b0d0',
+  hint = '#98bf80',
 
   -- Search
-  search = '#8b5f18',
-  search_highlight = '#5a3d0a',
+  search = '#a06820',
+  search_highlight = '#6a4810',
 
-  -- Special
-  cyan = '#80b5b3',
-  blue = '#6d9cbe',
-  purple = '#9876AA',
-  orange = '#FF8843',
-  yellow = '#E6CE64',
-  red = '#BF616A',
-  pink = '#b081b9',
+  -- Special (more saturated)
+  cyan = '#90c8c5',
+  blue = '#80b0d0',
+  purple = '#a888bb',
+  orange = '#ff9050',
+  yellow = '#f0d868',
+  red = '#d07078',
+  pink = '#c090c8',
 }
 
 local hi = function(group, opts)
@@ -363,4 +364,4 @@ hi('MatchParen', { fg = c.fg, bg = c.bg_dark, bold = true })
 -- Yanked text highlight
 hi('IncSearch', { fg = c.bg, bg = c.yellow })
 
-print('Maron Slime theme loaded')
+-- Theme loaded (print removed for performance)
