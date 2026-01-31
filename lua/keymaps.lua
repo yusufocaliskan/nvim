@@ -1,5 +1,5 @@
 -- VS Code-like keybindings for Neovim
--- Based on your VS Code settings
+-- Based on your VS Code settings.json
 
 local keymap = vim.keymap.set
 
@@ -8,8 +8,8 @@ keymap("n", "H", "^", { desc = "Go to beginning of line" })
 keymap("n", "L", "$", { desc = "Go to end of line" })
 
 -- Buffer navigation (matching <s-h> and <s-l>)
-keymap("n", "<S-h>", ":bprevious<CR>", { desc = "Previous buffer" })
-keymap("n", "<S-l>", ":bnext<CR>", { desc = "Next buffer" })
+keymap("n", "<S-h>", ":bprevious<CR>", { desc = "Previous buffer", silent = true })
+keymap("n", "<S-l>", ":bnext<CR>", { desc = "Next buffer", silent = true })
 
 -- Select all (Ctrl+A)
 keymap("n", "<C-a>", "ggVG", { desc = "Select all" })
@@ -18,12 +18,12 @@ keymap("n", "<C-a>", "ggVG", { desc = "Select all" })
 keymap("n", "u", "u", { desc = "Undo" })
 keymap("n", "U", "<C-r>", { desc = "Redo" })
 
--- Window/Split management
-keymap("n", "<leader>u", ":vsplit<CR>", { desc = "Vertical split" })
-keymap("n", "<leader>ts", ":split<CR>", { desc = "Horizontal split" })
-keymap("n", "<leader>tj", "<C-w>s", { desc = "Split editor down" })
-keymap("n", "<leader>ul", "<C-w>v", { desc = "Split editor left" })
-keymap("n", "<leader>ur", "<C-w>v<C-w>l", { desc = "Split editor right" })
+-- Window/Split management (exact VS Code match)
+keymap("n", "<leader>v", ":vsplit<CR>", { desc = "Vertical split", silent = true })
+keymap("n", "<leader>s", ":split<CR>", { desc = "Horizontal split", silent = true })
+keymap("n", "<leader>t", "<C-w>s", { desc = "Split editor down", silent = true })
+keymap("n", "<leader>y", "<C-w>v", { desc = "Split editor left", silent = true })
+keymap("n", "<leader>u", "<C-w>v<C-w>l", { desc = "Split editor right", silent = true })
 
 -- Window navigation
 keymap("n", "<leader>h", "<C-w>h", { desc = "Focus left group" })
@@ -32,98 +32,148 @@ keymap("n", "<leader>k", "<C-w>k", { desc = "Focus above group" })
 keymap("n", "<leader>l", "<C-w>l", { desc = "Focus right group" })
 
 -- File operations
-keymap("n", "<leader>w", ":w!<CR>", { desc = "Save file" })
+keymap("n", "<leader>w", ":w!<CR>", { desc = "Save file", silent = true })
 
--- Custom Q command: Save all files, save session, and quit
+-- Quick save and quit (Q command - confirmation handled by confirm-quit.nvim)
 vim.api.nvim_create_user_command('Q', function()
-  -- Save all modified buffers
   vim.cmd('wa!')
-
-  -- Save current session
   local cwd = vim.fn.getcwd()
   if cwd and cwd ~= vim.fn.expand('~') and cwd ~= '/' then
-    require('auto-session').SaveSession()
+    pcall(function() require('auto-session').SaveSession() end)
   end
+  vim.cmd('qa')
+end, { desc = "Save all and quit" })
 
-  -- Quit all
-  vim.cmd('qa!')
-end, { desc = "Save all files, save session, and quit" })
-
--- Search and replace
+-- Search and replace (exact VS Code match)
 keymap("n", "/", "/", { desc = "Find" })
 keymap("n", "<leader>/", ":%s/", { desc = "Find and replace" })
 
 -- Clear search highlight
-keymap("n", "<leader>-", ":noh<CR>", { desc = "Clear search highlight" })
+keymap("n", "<leader>-", ":noh<CR>", { desc = "Clear search highlight", silent = true })
 
--- Visual mode improvements
+-- Visual mode improvements (exact VS Code match)
 keymap("v", "p", "P", { desc = "Paste without yanking" })
 keymap("v", "<", "<gv", { desc = "Indent left and reselect" })
 keymap("v", ">", ">gv", { desc = "Indent right and reselect" })
-keymap("v", "<leader>c", ":Commentary<CR>", { desc = "Comment lines" })
+keymap("v", "<leader>c", "<Plug>(comment_toggle_linewise_visual)", { desc = "Comment lines" })
 
--- LSP keybindings (matching VS Code)
+-- LSP keybindings (exact VS Code match)
 keymap("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
-keymap("n", "gpd", ":lua vim.lsp.buf.definition()<CR>", { desc = "Peek definition" })
-keymap("n", "gf", vim.lsp.buf.hover, { desc = "Show hover" })
+keymap("n", "gpd", function() vim.lsp.buf.definition() end, { desc = "Peek definition" })
+keymap("n", "gf", vim.lsp.buf.hover, { desc = "Show hover (definition preview)" })
 keymap("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
-keymap("n", "gpi", ":lua vim.lsp.buf.implementation()<CR>", { desc = "Peek implementation" })
+keymap("n", "gpi", function() vim.lsp.buf.implementation() end, { desc = "Peek implementation" })
 keymap("n", "gr", vim.lsp.buf.references, { desc = "Find references" })
 keymap("n", "gt", vim.lsp.buf.type_definition, { desc = "Go to type definition" })
-keymap("n", "gpt", ":lua vim.lsp.buf.type_definition()<CR>", { desc = "Peek type definition" })
-keymap("n", "gq", vim.lsp.buf.code_action, { desc = "Code actions" })
-keymap("n", "gh", vim.lsp.buf.code_action, { desc = "Code actions" })
+keymap("n", "gpt", function() vim.lsp.buf.type_definition() end, { desc = "Peek type definition" })
+keymap("n", "gq", vim.lsp.buf.code_action, { desc = "Quick fix" })
+keymap("n", "gh", vim.lsp.buf.code_action, { desc = "Quick fix" })
 keymap("n", "<leader>r", vim.lsp.buf.rename, { desc = "Rename symbol" })
 keymap("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code actions" })
 
--- Diagnostics navigation
+-- Diagnostics navigation (exact VS Code match: ' and ;)
 keymap("n", "'", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
 keymap("n", ";", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 
--- Folding
-keymap("n", "<leader>f", "za", { desc = "Toggle fold" })
+-- Project/File navigation
+keymap("n", "<leader>pf", ":Telescope find_files<CR>", { desc = "Find files", silent = true })
+keymap("n", "<leader>pe", ":Neotree focus<CR>", { desc = "Focus file explorer", silent = true })
 
--- Project management and debugging
-keymap("n", "<leader>pf", ":Telescope find_files<CR>", { desc = "Find files" })
-keymap("n", "<leader>pr", ":lua vim.cmd('!npm run dev')<CR>", { desc = "Run project" })
-keymap("n", "<leader>ps", ":lua print('Debug stop')<CR>", { desc = "Stop debug" })
-keymap("n", "<leader>pd", ":lua print('Debug start')<CR>", { desc = "Start debug" })
+-- Debug (placeholder - update with actual DAP commands)
+keymap("n", "<leader>ps", function()
+  if pcall(require, 'dap') then require('dap').terminate() end
+end, { desc = "Debug stop" })
+keymap("n", "<leader>pd", function()
+  if pcall(require, 'dap') then require('dap').continue() end
+end, { desc = "Debug start/continue" })
 
--- Git operations
-keymap("n", "<leader>gh", ":DiffviewOpen<CR>", { desc = "View git changes" })
-keymap("n", "<leader>gy", ":DiffviewFileHistory %<CR>", { desc = "File git history" })
-keymap("n", "<leader>gt", ":DiffviewToggleFiles<CR>", { desc = "Toggle git files" })
-keymap("n", "<leader>gi", ":Git<CR>", { desc = "Git status" })
+-- Git operations (exact VS Code match)
+keymap("n", "<leader>gy", ":DiffviewFileHistory %<CR>", { desc = "File git history", silent = true })
+keymap("n", "<leader>gt", ":Telescope git_status<CR>", { desc = "Git status files", silent = true })
+keymap("n", "<leader>gi", function() Snacks.lazygit() end, { desc = "Lazygit", silent = true })
 
--- Breakpoints/bookmarks
-keymap("n", "<leader>b", ":lua require('dap').toggle_breakpoint()<CR>", { desc = "Toggle breakpoint" })
-keymap("n", "<leader>ba", ":lua print('Toggle bookmark')<CR>", { desc = "Toggle bookmark" })
-keymap("n", "<leader>bn", ":lua print('Next bookmark')<CR>", { desc = "Next bookmark" })
-keymap("n", "<leader>bp", ":lua print('Previous bookmark')<CR>", { desc = "Previous bookmark" })
-keymap("n", "<leader>bb", ":lua print('Clear bookmarks')<CR>", { desc = "Clear bookmarks" })
-keymap("n", "<leader>BB", ":lua print('Clear all bookmarks')<CR>", { desc = "Clear all bookmarks" })
+-- Breakpoints (VS Code debug)
+keymap("n", "<leader>b", function()
+  if pcall(require, 'dap') then require('dap').toggle_breakpoint() end
+end, { desc = "Toggle breakpoint" })
+
+-- Bookmarks (handled by bookmarks.nvim plugin - see init.lua)
+-- <leader>ba - toggle bookmark
+-- <leader>bn - next bookmark
+-- <leader>bp - prev bookmark
+-- <leader>bl - list bookmarks
+-- <leader>bb - clear bookmarks
+-- <leader>BL - all bookmarks (telescope)
 
 -- Toggle boolean (extension.toggleBool equivalent)
-keymap("n", "<leader>i", ":lua require('ts-node-action').node_action()<CR>", { desc = "Toggle boolean/smart action" })
+keymap("n", "<leader>i", function()
+  if pcall(require, 'ts-node-action') then require('ts-node-action').node_action() end
+end, { desc = "Toggle boolean/smart action" })
 
 -- Find in files
-keymap("n", "<leader>fr", ":Telescope live_grep<CR>", { desc = "Find in files" })
+keymap("n", "<leader>fr", ":Telescope live_grep<CR>", { desc = "Find in files", silent = true })
 
--- Custom VS Code-like workflow
-keymap("n", "<C-j>", ":lua print('Quick open next')<CR>", { desc = "Quick open next" })
-keymap("n", "<C-k>", ":lua print('Quick open prev')<CR>", { desc = "Quick open previous" })
+-- Session management
+keymap("n", "<leader>se", ":SessionSave<CR>", { desc = "Save session", silent = true })
+keymap("n", "<leader>sl", ":SessionRestore<CR>", { desc = "Load session", silent = true })
+keymap("n", "<leader>sd", ":SessionDelete<CR>", { desc = "Delete session", silent = true })
+keymap("n", "<leader>sf", ":Telescope session-lens search_session<CR>", { desc = "Find sessions", silent = true })
 
--- Session management (VS Code-like workspace)
-keymap("n", "<leader>se", ":SessionSave<CR>", { desc = "Save session" })
-keymap("n", "<leader>sl", ":SessionRestore<CR>", { desc = "Load session" })
-keymap("n", "<leader>sd", ":SessionDelete<CR>", { desc = "Delete session" })
-keymap("n", "<leader>sf", ":Telescope session-lens search_session<CR>", { desc = "Find sessions" })
+-- Recent files
+keymap("n", "<leader>fo", ":Telescope oldfiles<CR>", { desc = "Recent files", silent = true })
+keymap("n", "<leader>o", ":Telescope oldfiles<CR>", { desc = "Recent files", silent = true })
 
--- Supermaven AI - Fast Cursor-like tab completion
-keymap("n", "<leader>sm", ":SupermavenToggle<CR>", { desc = "Toggle Supermaven" })
-keymap("n", "<leader>sr", ":SupermavenRestart<CR>", { desc = "Restart Supermaven" })
-keymap("n", "<leader>ss", ":SupermavenStart<CR>", { desc = "Start Supermaven" })
-keymap("n", "<leader>sp", ":SupermavenStop<CR>", { desc = "Stop Supermaven" })
+-- Supermaven AI
+keymap("n", "<leader>sm", ":SupermavenToggle<CR>", { desc = "Toggle Supermaven", silent = true })
 
--- File explorer (now handled by neo-tree in init.lua)
--- keymap("n", "<leader>e", ":Oil<CR>", { desc = "Toggle file explorer" })
+-- Chat/AI (VS Code-like)
+keymap("n", "<leader>pc", "<cmd>ClaudeCode<cr>", { desc = "Toggle Claude", silent = true })
+keymap("n", "<leader>po", "<cmd>ClaudeCode<cr>", { desc = "Open Claude", silent = true })
+keymap("n", "<leader>pi", "<cmd>Neotree toggle<cr>", { desc = "Toggle sidebar", silent = true })
+
+-- Go specific keymaps
+keymap("n", "<leader>gat", ":GoAddTag<CR>", { desc = "Go: Add tags", silent = true })
+keymap("n", "<leader>grt", ":GoRmTag<CR>", { desc = "Go: Remove tags", silent = true })
+keymap("n", "<leader>gfs", ":GoFillStruct<CR>", { desc = "Go: Fill struct", silent = true })
+keymap("n", "<leader>gie", ":GoIfErr<CR>", { desc = "Go: Add if err", silent = true })
+keymap("n", "<leader>gor", ":GoRun<CR>", { desc = "Go: Run", silent = true })
+keymap("n", "<leader>gob", ":GoBuild<CR>", { desc = "Go: Build", silent = true })
+keymap("n", "<leader>got", ":GoTest<CR>", { desc = "Go: Test", silent = true })
+keymap("n", "<leader>goc", ":GoCoverage<CR>", { desc = "Go: Coverage", silent = true })
+keymap("n", "<leader>gof", ":GoTestFunc<CR>", { desc = "Go: Test function", silent = true })
+keymap("n", "<leader>gom", ":GoMod<CR>", { desc = "Go: Go mod tidy", silent = true })
+
+-- Buffer close
+keymap("n", "<leader>q", ":bd<CR>", { desc = "Close buffer", silent = true })
+keymap("n", "<leader>Q", ":bd!<CR>", { desc = "Force close buffer", silent = true })
+
+-- Cmd+W from iTerm2 (receives as <M-w> or <A-w>)
+-- Close split if multiple windows, otherwise close buffer
+keymap("n", "<M-w>", function()
+  if vim.fn.winnr('$') > 1 then
+    vim.cmd('close')  -- Close current split
+  else
+    vim.cmd('bd')     -- Close buffer if single window
+  end
+end, { desc = "Close split/buffer", silent = true })
+
+-- Terminal toggle (Space+Shift+T and Cmd+Shift+T from iTerm2)
+keymap("n", "<leader>T", function() Snacks.terminal() end, { desc = "Toggle Terminal" })
+keymap("n", "<M-T>", function() Snacks.terminal() end, { desc = "Toggle Terminal" })
+keymap("t", "<M-T>", function() Snacks.terminal() end, { desc = "Toggle Terminal" })
+
+-- Center screen after jumps
+keymap("n", "<C-d>", "<C-d>zz", { desc = "Half page down + center" })
+keymap("n", "<C-u>", "<C-u>zz", { desc = "Half page up + center" })
+keymap("n", "n", "nzzzv", { desc = "Next search + center" })
+keymap("n", "N", "Nzzzv", { desc = "Prev search + center" })
+
+-- Move lines (VS Code Alt+Up/Down)
+keymap("n", "<A-j>", ":m .+1<CR>==", { desc = "Move line down", silent = true })
+keymap("n", "<A-k>", ":m .-2<CR>==", { desc = "Move line up", silent = true })
+keymap("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move selection down", silent = true })
+keymap("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move selection up", silent = true })
+
+-- Duplicate line (VS Code Shift+Alt+Down)
+keymap("n", "<S-A-j>", ":t.<CR>", { desc = "Duplicate line down", silent = true })
+keymap("n", "<S-A-k>", ":t-1<CR>", { desc = "Duplicate line up", silent = true })

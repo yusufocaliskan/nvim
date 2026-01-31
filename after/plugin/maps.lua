@@ -136,16 +136,17 @@ require('mini.clue').setup({
 --}
 
 -- Gutter Symbols
-local signs = {
-  Error = "E",
-  Warn = "W",
-  Hint = "H",
-  Info = "I"
-}
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
+-- Diagnostic signs (new API)
+vim.diagnostic.config({
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "E",
+      [vim.diagnostic.severity.WARN] = "W",
+      [vim.diagnostic.severity.HINT] = "H",
+      [vim.diagnostic.severity.INFO] = "I",
+    },
+  },
+})
 
 require('telescope').load_extension("file_browser")
 

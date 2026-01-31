@@ -35,16 +35,24 @@ local plugins = {
   },
   {
     "neanias/everforest-nvim",
-    lazy = false,
+    lazy = true,  -- Keep as backup
     version = false,
-    priority = 1000,  -- Load early
     config = function()
       require("everforest").setup {
         background = "hard",
         disable_italic_comments = true,
       }
-      -- Set everforest as the colorscheme
-      vim.cmd("colorscheme everforest")
+    end
+  },
+
+  -- Maron Slime Theme (converted from VS Code)
+  {
+    dir = vim.fn.stdpath('config') .. '/colors',
+    name = 'maron_slime',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.cmd('colorscheme maron_slime')
     end
   },
   -- { "pgdouyon/vim-yin-yang",   lazy = true },
@@ -206,153 +214,54 @@ local plugins = {
   -- Enhanced session management for splits and layouts
   {
     'rmagatti/auto-session',
+    lazy = false,
+    priority = 900,
     config = function()
       require('auto-session').setup({
-        log_level = 'info',
-        auto_session_enable_last_session = false,  -- Disable automatic last session loading
+        log_level = 'error',
         auto_session_root_dir = vim.fn.stdpath('data') .. '/sessions/',
-        auto_session_enabled = true,
-        auto_save_enabled = true,
-        auto_restore_enabled = false,  -- We'll handle this manually
-        auto_session_create_enabled = true,  -- Automatically create sessions
+
+        -- AUTO SAVE & RESTORE
+        auto_save = true,
+        auto_restore = true,
+        auto_create = true,
 
         -- Suppress directories where we don't want sessions
-        auto_session_suppress_dirs = {
+        suppressed_dirs = {
           '/',
           '/tmp',
           '/home',
           '/Users',
-          vim.fn.expand('~'),
+          '~',
         },
 
-        -- Use better session file naming
-        auto_session_use_git_branch = false,
+        -- Session options - what to save
+        session_lens = {
+          load_on_setup = true,
+          previewer = false,
+        },
 
-        -- Pre and post session hooks for better split handling
+        -- Pre save: close special windows
         pre_save_cmds = {
           function()
-            -- Close problematic windows before saving
-            local wins = vim.api.nvim_list_wins()
-            for _, win in ipairs(wins) do
-              local buf = vim.api.nvim_win_get_buf(win)
-              local ft = vim.api.nvim_buf_get_option(buf, 'filetype')
-              if ft == 'neo-tree' or ft == 'NvimTree' or ft == 'alpha' then
+            -- Close neo-tree, nvim-tree, etc.
+            vim.cmd('silent! Neotree close')
+            -- Close any floating windows
+            for _, win in ipairs(vim.api.nvim_list_wins()) do
+              local config = vim.api.nvim_win_get_config(win)
+              if config.relative ~= '' then
                 vim.api.nvim_win_close(win, false)
               end
             end
           end
         },
 
+        -- Post restore: equalize windows
         post_restore_cmds = {
           function()
-            -- Wait a bit and then restore layout
-            vim.defer_fn(function()
-              vim.cmd('wincmd =')  -- Equalize window sizes
-              -- Trigger buffer events to reload content
-              for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-                if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_name(buf) ~= '' then
-                  vim.api.nvim_buf_call(buf, function()
-                    vim.cmd('silent! e!')
-                  end)
-                end
-              end
-            end, 100)
+            vim.cmd('wincmd =')
           end
         },
-
-        -- Session lens configuration
-        session_lens = {
-          buftypes_to_ignore = { 'terminal' },
-          load_on_setup = true,
-          theme_conf = { border = true },
-          previewer = false,
-        },
-
-        -- Better cwd change handling
-        cwd_change_handling = {
-          restore_upcoming_session = true,
-          pre_cwd_changed_hook = nil,
-          post_cwd_changed_hook = function()
-            -- Only save if we're in a real directory
-            local cwd = vim.fn.getcwd()
-            if cwd and cwd ~= vim.fn.expand('~') and cwd ~= '/' then
-              require('auto-session').SaveSession()
-            end
-          end,
-        },
-      })
-
-      -- Project-specific session restore on startup
-      vim.api.nvim_create_autocmd({ 'VimEnter' }, {
-        nested = true,
-        callback = function()
-          -- Only auto-restore if no files were specified
-          if vim.fn.argc() == 0 then
-            local cwd = vim.fn.getcwd()
-            if cwd and cwd ~= vim.fn.expand('~') and cwd ~= '/' then
-              -- Try to restore session, only if it exists
-              vim.schedule(function()
-                local success, err = pcall(function()
-                  require('auto-session').RestoreSession()
-                end)
-
-                if success then
-                  print("Restored session for: " .. vim.fn.fnamemodify(cwd, ':t'))
-                else
-                  -- Session doesn't exist or failed to restore
-                  if err and not err:match("No session found") then
-                    print("No previous session found for: " .. vim.fn.fnamemodify(cwd, ':t'))
-                  end
-                end
-              end)
-            end
-          end
-        end
-      })
-
-      -- Manual session saving with better conditions
-      vim.api.nvim_create_autocmd({ 'VimLeavePre' }, {
-        callback = function()
-          local cwd = vim.fn.getcwd()
-          -- Only save if we're in a project directory
-          if cwd and cwd ~= vim.fn.expand('~') and cwd ~= '/' and vim.fn.argc() >= 0 then
-            require('auto-session').SaveSession()
-          end
-        end
-      })
-
-      -- Immediate session save on file write (:w)
-      vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
-        callback = function()
-          local cwd = vim.fn.getcwd()
-          if cwd and cwd ~= vim.fn.expand('~') and cwd ~= '/' then
-            if vim.bo.buftype == '' and vim.bo.filetype ~= '' then
-              -- Save session silently when file is saved
-              vim.schedule(function()
-                vim.cmd('silent! SessionSave')
-              end)
-            end
-          end
-        end
-      })
-
-      -- Periodic auto-save for other window events
-      local save_timer = nil
-      vim.api.nvim_create_autocmd({ 'WinEnter', 'WinClosed' }, {
-        callback = function()
-          if save_timer then
-            vim.fn.timer_stop(save_timer)
-          end
-
-          save_timer = vim.fn.timer_start(3000, function()
-            local cwd = vim.fn.getcwd()
-            if cwd and cwd ~= vim.fn.expand('~') and cwd ~= '/' then
-              if vim.bo.buftype == '' and vim.bo.filetype ~= '' then
-                require('auto-session').SaveSession()
-              end
-            end
-          end)
-        end
       })
     end
   },
@@ -371,7 +280,7 @@ local plugins = {
   {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-    enabled = false,
+    enabled = true,
     lazy = true,
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
@@ -380,7 +289,7 @@ local plugins = {
     config = function()
       require('nvim-treesitter.configs').setup {
         -- Add languages to be installed here that you want installed for treesitter
-        ensure_installed = { "golang", "go", 'c', 'cpp', 'lua', 'python', 'rust', 'typescript', 'sql', 'scala', 'zig', 'vim', 'vimdoc' },
+        ensure_installed = { "go", "gomod", "gowork", "gosum", 'c', 'cpp', 'lua', 'python', 'rust', 'typescript', 'sql', 'scala', 'zig', 'vim', 'vimdoc' },
 
         highlight = { enable = true },
         indent = { enable = true },
@@ -520,6 +429,8 @@ local plugins = {
             ["<space>"] = "none",
             ["o"] = "open",
             ["<cr>"] = "open",
+            ["l"] = "open",              -- vim-like open/expand
+            ["h"] = "close_node",        -- vim-like close/collapse
             ["<bs>"] = "navigate_up",
             ["."] = "set_root",
             ["H"] = "toggle_hidden",
@@ -527,9 +438,10 @@ local plugins = {
             ["/"] = "fuzzy_finder",
             ["f"] = "filter_on_submit",
             ["<c-x>"] = "clear_filter",
-            ["a"] = "add",
-            ["d"] = "delete",
-            ["r"] = "rename",
+            ["n"] = "add",               -- New file
+            ["d"] = "delete",            -- Delete
+            ["r"] = "rename",            -- Rename
+            ["a"] = "add",               -- Add (alternative)
             ["y"] = "copy_to_clipboard",
             ["x"] = "cut_to_clipboard",
             ["p"] = "paste_from_clipboard",
@@ -567,24 +479,19 @@ local plugins = {
 
   {
     'neovim/nvim-lspconfig',
-    lazy = true,
+    event = { 'BufReadPre', 'BufNewFile' },
     config = function()
+      -- LSP keymaps on attach
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if not client then return end
-          if client.supports_method('textDocument/formatting') then
-            vim.api.nvim_create_autocmd('BufWritePre', {
-              buffer = args.buf,
-              callback = function()
-                vim.lsp.buf.format({
-                  bufnr = args.buf,
-                  id = client.id,
-                  async = false
-                })
-              end
-            })
-          end
+          local opts = { buffer = args.buf }
+          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+          vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+          vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+          vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+          vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+          vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+          vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
         end
       })
     end
@@ -696,6 +603,174 @@ local plugins = {
   --   }
   -- },
   { 'scalameta/nvim-metals', dependencies = { 'nvim-lua/plenary.nvim' }, lazy = true },
+
+  -- Rust specific plugins
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^5',
+    lazy = false,
+    ft = { 'rust' },
+    config = function()
+      vim.g.rustaceanvim = {
+        -- Plugin configuration
+        tools = {
+          hover_actions = {
+            auto_focus = true,
+          },
+          inlay_hints = {
+            auto = true,
+            show_parameter_hints = true,
+          },
+        },
+        -- LSP configuration
+        server = {
+          on_attach = function(client, bufnr)
+            local opts = { buffer = bufnr }
+
+            -- Enable inlay hints (Neovim 0.10+) with delay for rust-analyzer
+            if vim.lsp.inlay_hint then
+              vim.defer_fn(function()
+                vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+              end, 500)
+            end
+
+            -- Rust-specific keymaps
+            vim.keymap.set('n', '<leader>ra', function() vim.cmd.RustLsp('codeAction') end, { buffer = bufnr, desc = 'Rust code action' })
+            vim.keymap.set('n', '<leader>rd', function() vim.cmd.RustLsp('debuggables') end, { buffer = bufnr, desc = 'Rust debuggables' })
+            vim.keymap.set('n', '<leader>rr', function() vim.cmd.RustLsp('runnables') end, { buffer = bufnr, desc = 'Rust runnables' })
+            vim.keymap.set('n', '<leader>rt', function() vim.cmd.RustLsp('testables') end, { buffer = bufnr, desc = 'Rust testables' })
+            vim.keymap.set('n', '<leader>rm', function() vim.cmd.RustLsp('expandMacro') end, { buffer = bufnr, desc = 'Expand macro' })
+            vim.keymap.set('n', '<leader>rc', function() vim.cmd.RustLsp('openCargo') end, { buffer = bufnr, desc = 'Open Cargo.toml' })
+            vim.keymap.set('n', '<leader>rp', function() vim.cmd.RustLsp('parentModule') end, { buffer = bufnr, desc = 'Parent module' })
+            vim.keymap.set('n', '<leader>rj', function() vim.cmd.RustLsp('joinLines') end, { buffer = bufnr, desc = 'Join lines' })
+            vim.keymap.set('n', '<leader>rh', function() vim.cmd.RustLsp({ 'hover', 'actions' }) end, { buffer = bufnr, desc = 'Hover actions' })
+            vim.keymap.set('n', '<leader>re', function() vim.cmd.RustLsp('explainError') end, { buffer = bufnr, desc = 'Explain error' })
+            vim.keymap.set('n', '<leader>rD', function() vim.cmd.RustLsp('renderDiagnostic') end, { buffer = bufnr, desc = 'Render diagnostic' })
+            vim.keymap.set('n', '<leader>ri', function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
+            end, { buffer = bufnr, desc = 'Toggle inlay hints' })
+          end,
+          default_settings = {
+            ['rust-analyzer'] = {
+              cargo = {
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                buildScripts = {
+                  enable = true,
+                },
+              },
+              checkOnSave = true,
+              check = {
+                command = 'clippy',
+                extraArgs = { '--no-deps' },
+              },
+              procMacro = {
+                enable = true,
+                ignored = {
+                  ['async-trait'] = { 'async_trait' },
+                  ['napi-derive'] = { 'napi' },
+                  ['async-recursion'] = { 'async_recursion' },
+                },
+              },
+              inlayHints = {
+                bindingModeHints = { enable = true },
+                chainingHints = { enable = true },
+                closingBraceHints = { enable = true, minLines = 25 },
+                closureReturnTypeHints = { enable = 'with_block' },
+                lifetimeElisionHints = { enable = 'always', useParameterNames = true },
+                maxLength = 25,
+                parameterHints = { enable = true },
+                reborrowHints = { enable = 'always' },
+                renderColons = true,
+                typeHints = {
+                  enable = true,
+                  hideClosureInitialization = false,
+                  hideNamedConstructor = false,
+                },
+              },
+            },
+          },
+        },
+      }
+    end,
+  },
+
+  -- Crates.nvim: Cargo.toml dependency management
+  {
+    'saecki/crates.nvim',
+    event = { 'BufRead Cargo.toml' },
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      local crates = require('crates')
+      crates.setup({
+        lsp = {
+          enabled = true,
+          actions = true,
+          completion = true,
+          hover = true,
+        },
+        completion = {
+          cmp = {
+            enabled = true,
+          },
+        },
+        popup = {
+          autofocus = true,
+          border = 'rounded',
+        },
+      })
+
+      -- Keymaps for Cargo.toml
+      vim.api.nvim_create_autocmd('BufRead', {
+        pattern = 'Cargo.toml',
+        callback = function(ev)
+          local opts = { buffer = ev.buf }
+          vim.keymap.set('n', '<leader>ct', crates.toggle, { buffer = ev.buf, desc = 'Toggle crates' })
+          vim.keymap.set('n', '<leader>cr', crates.reload, { buffer = ev.buf, desc = 'Reload crates' })
+          vim.keymap.set('n', '<leader>cv', crates.show_versions_popup, { buffer = ev.buf, desc = 'Show versions' })
+          vim.keymap.set('n', '<leader>cf', crates.show_features_popup, { buffer = ev.buf, desc = 'Show features' })
+          vim.keymap.set('n', '<leader>cd', crates.show_dependencies_popup, { buffer = ev.buf, desc = 'Show dependencies' })
+          vim.keymap.set('n', '<leader>cu', crates.update_crate, { buffer = ev.buf, desc = 'Update crate' })
+          vim.keymap.set('v', '<leader>cu', crates.update_crates, { buffer = ev.buf, desc = 'Update crates' })
+          vim.keymap.set('n', '<leader>ca', crates.update_all_crates, { buffer = ev.buf, desc = 'Update all crates' })
+          vim.keymap.set('n', '<leader>cU', crates.upgrade_crate, { buffer = ev.buf, desc = 'Upgrade crate' })
+          vim.keymap.set('v', '<leader>cU', crates.upgrade_crates, { buffer = ev.buf, desc = 'Upgrade crates' })
+          vim.keymap.set('n', '<leader>cA', crates.upgrade_all_crates, { buffer = ev.buf, desc = 'Upgrade all crates' })
+          vim.keymap.set('n', '<leader>cH', crates.open_homepage, { buffer = ev.buf, desc = 'Open homepage' })
+          vim.keymap.set('n', '<leader>cR', crates.open_repository, { buffer = ev.buf, desc = 'Open repository' })
+          vim.keymap.set('n', '<leader>cD', crates.open_documentation, { buffer = ev.buf, desc = 'Open docs' })
+          vim.keymap.set('n', '<leader>cC', crates.open_crates_io, { buffer = ev.buf, desc = 'Open crates.io' })
+        end,
+      })
+    end,
+  },
+
+  -- Go specific plugins
+  {
+    'ray-x/go.nvim',
+    dependencies = {
+      'ray-x/guihua.lua',
+      'neovim/nvim-lspconfig',
+      'nvim-treesitter/nvim-treesitter',
+    },
+    config = function()
+      require('go').setup({
+        goimports = 'gopls',
+        gofmt = 'gofumpt',
+        test_runner = 'go',
+        luasnip = true,
+        trouble = true,
+        test_efm = true,
+        icons = false,
+        run_in_floaterm = true,
+        lsp_cfg = true,  -- Enable LSP config
+        lsp_on_attach = nil,  -- Use default or custom attach
+      })
+    end,
+    event = { "CmdlineEnter" },
+    ft = { "go", 'gomod' },
+    build = ':lua require("go.install").update_all_sync()'
+  },
 
     {
     "coder/claudecode.nvim",
@@ -832,15 +907,23 @@ local plugins = {
     end,
   },
 
-  -- Disable which-key popup
+  -- Which-key: show keybindings popup
   {
     "folke/which-key.nvim",
-    enabled = true,  -- Completely disable which-key
+    event = "VeryLazy",
+    init = function()
+      vim.o.timeout = true
+      vim.o.timeoutlen = 2000  -- 2 saniye
+    end,
+    opts = {
+      delay = 2000,
+    },
   },
 
   -- Supermaven - Fast AI completion (Cursor alternative)
   {
     "supermaven-inc/supermaven-nvim",
+    enabled = true,  -- Can use alongside minuet-ai
     config = function()
       require("supermaven-nvim").setup({
         keymaps = {
@@ -854,8 +937,8 @@ local plugins = {
           cterm = 244,
         },
         log_level = "info",
-        disable_inline_completion = false, -- keep inline suggestions
-        disable_keymaps = false, -- use built-in keymaps
+        disable_inline_completion = false,
+        disable_keymaps = false,
       })
     end,
   },
@@ -868,26 +951,48 @@ local plugins = {
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
+      'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip',
+      'rafamadriz/friendly-snippets',
     },
     config = function()
       local cmp = require('cmp')
+      local luasnip = require('luasnip')
+      require('luasnip.loaders.from_vscode').lazy_load()
+
       cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
         mapping = cmp.mapping.preset.insert({
           ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
           ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
           ['<CR>'] = cmp.mapping.confirm({ select = true }),
           ['<C-Space>'] = cmp.mapping.complete(),
+          ['<C-l>'] = cmp.mapping(function()
+            if luasnip.expand_or_locally_jumpable() then
+              luasnip.expand_or_jump()
+            end
+          end, { 'i', 's' }),
+          ['<C-h>'] = cmp.mapping(function()
+            if luasnip.locally_jumpable(-1) then
+              luasnip.jump(-1)
+            end
+          end, { 'i', 's' }),
         }),
         sources = cmp.config.sources({
           { name = 'nvim_lsp' },
+          { name = 'luasnip' },
           { name = 'buffer' },
           { name = 'path' },
         }),
         formatting = {
           format = function(entry, item)
-            -- Add source indicator
             item.menu = ({
               nvim_lsp = '[LSP]',
+              luasnip = '[Snip]',
               buffer = '[Buffer]',
               path = '[Path]',
             })[entry.source.name]
@@ -896,11 +1001,339 @@ local plugins = {
         },
       })
     end,
-  }
+  },
+
+  -- Mason: LSP/DAP/Linter/Formatter package manager
+  {
+    'williamboman/mason.nvim',
+    dependencies = {
+      'williamboman/mason-lspconfig.nvim',
+      'neovim/nvim-lspconfig',
+    },
+    config = function()
+      require('mason').setup({
+        ui = {
+          icons = {
+            package_installed = "✓",
+            package_pending = "➜",
+            package_uninstalled = "✗"
+          }
+        }
+      })
+
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      -- Add cmp capabilities if available
+      local ok, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
+      if ok then
+        capabilities = vim.tbl_deep_extend('force', capabilities, cmp_lsp.default_capabilities())
+      end
+
+      require('mason-lspconfig').setup({
+        ensure_installed = {
+          'lua_ls',
+          'gopls',
+          'ts_ls',
+          'pyright',
+          -- rust_analyzer is handled by rustaceanvim
+        },
+        automatic_installation = true,
+        handlers = {
+          -- Default handler for all servers
+          function(server_name)
+            require('lspconfig')[server_name].setup({
+              capabilities = capabilities,
+            })
+          end,
+          -- Custom handler for lua_ls
+          ['lua_ls'] = function()
+            require('lspconfig').lua_ls.setup({
+              capabilities = capabilities,
+              settings = {
+                Lua = {
+                  diagnostics = { globals = { 'vim' } },
+                  workspace = { checkThirdParty = false },
+                },
+              },
+            })
+          end,
+          -- gopls is handled by go.nvim, skip here
+          ['gopls'] = function() end,
+          -- rust_analyzer is handled by rustaceanvim, skip here
+          ['rust_analyzer'] = function() end,
+        },
+      })
+
+      -- Ensure rust-analyzer and codelldb are installed via Mason (deferred)
+      vim.defer_fn(function()
+        local ok, mason_registry = pcall(require, 'mason-registry')
+        if not ok then return end
+
+        mason_registry.refresh(function()
+          local ensure_installed_tools = { 'rust-analyzer', 'codelldb' }
+          for _, tool in ipairs(ensure_installed_tools) do
+            local pkg_ok, pkg = pcall(mason_registry.get_package, tool)
+            if pkg_ok and not pkg:is_installed() then
+              pkg:install()
+            end
+          end
+        end)
+      end, 1000)
+    end,
+  },
+
+  -- Conform: Fast formatter
+  {
+    'stevearc/conform.nvim',
+    event = { 'BufWritePre' },
+    cmd = { 'ConformInfo' },
+    keys = {
+      { '<leader>cf', function() require('conform').format({ async = true, lsp_fallback = true }) end, desc = 'Format buffer' },
+    },
+    opts = {
+      formatters_by_ft = {
+        lua = { 'stylua' },
+        python = { 'black' },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'prettierd', 'prettier', stop_after_first = true },
+        go = { 'gofumpt', 'goimports' },
+        rust = { 'rustfmt' },
+      },
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_fallback = true,
+      },
+    },
+  },
+
+  -- nvim-lint: Async linter
+  {
+    'mfussenegger/nvim-lint',
+    event = { 'BufReadPre', 'BufNewFile' },
+    config = function()
+      local lint = require('lint')
+      lint.linters_by_ft = {
+        javascript = { 'eslint_d' },
+        typescript = { 'eslint_d' },
+        javascriptreact = { 'eslint_d' },
+        typescriptreact = { 'eslint_d' },
+        python = { 'ruff' },
+        go = { 'golangcilint' },
+      }
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
+        callback = function()
+          lint.try_lint()
+        end,
+      })
+    end,
+  },
+
+  -- Harpoon: Quick file navigation
+  {
+    'ThePrimeagen/harpoon',
+    branch = 'harpoon2',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      local harpoon = require('harpoon')
+      harpoon:setup()
+
+      vim.keymap.set('n', '<leader>ma', function() harpoon:list():add() end, { desc = 'Harpoon add file' })
+      vim.keymap.set('n', '<leader>mm', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = 'Harpoon menu' })
+      vim.keymap.set('n', '<leader>1', function() harpoon:list():select(1) end, { desc = 'Harpoon file 1' })
+      vim.keymap.set('n', '<leader>2', function() harpoon:list():select(2) end, { desc = 'Harpoon file 2' })
+      vim.keymap.set('n', '<leader>3', function() harpoon:list():select(3) end, { desc = 'Harpoon file 3' })
+      vim.keymap.set('n', '<leader>4', function() harpoon:list():select(4) end, { desc = 'Harpoon file 4' })
+      vim.keymap.set('n', '<C-p>', function() harpoon:list():prev() end, { desc = 'Harpoon prev' })
+      vim.keymap.set('n', '<C-n>', function() harpoon:list():next() end, { desc = 'Harpoon next' })
+    end,
+  },
+
+  -- Indent blankline: Show indentation guides
+  {
+    'lukas-reineke/indent-blankline.nvim',
+    main = 'ibl',
+    opts = {
+      indent = { char = '│' },
+      scope = { enabled = true },
+    },
+  },
+
+  -- nvim-ts-autotag: Auto close HTML/JSX tags
+  {
+    'windwp/nvim-ts-autotag',
+    event = 'InsertEnter',
+    opts = {},
+  },
+
+  -- Noice: Better UI for messages, cmdline, popupmenu
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+      'rcarriga/nvim-notify',
+    },
+    opts = {
+      routes = {
+        -- Yank mesajlarını gizle
+        { filter = { event = 'msg_show', find = 'yanked' }, opts = { skip = true } },
+        { filter = { event = 'msg_show', find = 'fewer lines' }, opts = { skip = true } },
+        { filter = { event = 'msg_show', find = 'more lines' }, opts = { skip = true } },
+        { filter = { event = 'msg_show', find = 'lines yanked' }, opts = { skip = true } },
+      },
+      lsp = {
+        override = {
+          ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+          ['vim.lsp.util.stylize_markdown'] = true,
+          ['cmp.entry.get_documentation'] = true,
+        },
+      },
+      presets = {
+        bottom_search = true,
+        command_palette = true,
+        long_message_to_split = true,
+        inc_rename = false,
+        lsp_doc_border = true,
+      },
+    },
+  },
+
+  -- Todo-comments: Highlight TODO, FIXME, etc.
+  {
+    'folke/todo-comments.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {},
+    keys = {
+      { '<leader>st', '<cmd>TodoTelescope<cr>', desc = 'Search TODOs' },
+    },
+  },
+
+  -- Treesj: Split/join code blocks
+  {
+    'Wansmer/treesj',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    keys = {
+      { '<leader>J', '<cmd>TSJToggle<cr>', desc = 'Toggle split/join' },
+    },
+    config = function()
+      local tsj = require('treesj')
+      local langs = require('treesj.langs')
+
+      -- Get default presets and extend typescript
+      local typescript_preset = langs.presets.typescript or {}
+
+      -- Add property_identifier support (inherits object behavior)
+      typescript_preset.property_identifier = {
+        both = {
+          fallback = function(tsnode)
+            -- Fall back to parent node for split/join
+            local parent = tsnode:parent()
+            if parent then
+              return parent
+            end
+          end
+        }
+      }
+
+      tsj.setup({
+        use_default_keymaps = false,
+        max_join_length = 150,
+        langs = {
+          typescript = typescript_preset,
+          tsx = typescript_preset,
+        },
+      })
+    end,
+  },
+
+  -- Undotree: Visual undo history
+  {
+    'mbbill/undotree',
+    keys = {
+      { '<leader>U', '<cmd>UndotreeToggle<cr>', desc = 'Toggle undotree' },
+    },
+  },
+
+  -- Bookmarks (VS Code bookmarks extension)
+  {
+    'tomasky/bookmarks.nvim',
+    event = 'VeryLazy',
+    config = function()
+      require('bookmarks').setup({
+        save_file = vim.fn.stdpath('data') .. '/bookmarks',
+        keywords = {
+          ['@t'] = ' ', -- TODO
+          ['@w'] = ' ', -- WARN
+          ['@f'] = ' ', -- FIX
+          ['@n'] = ' ', -- NOTE
+        },
+        on_attach = function(bufnr)
+          local bm = require('bookmarks')
+          local map = vim.keymap.set
+          map('n', '<leader>ba', bm.bookmark_toggle, { desc = 'Toggle bookmark', buffer = bufnr })
+          map('n', '<leader>bi', bm.bookmark_ann, { desc = 'Bookmark annotate', buffer = bufnr })
+          map('n', '<leader>bn', bm.bookmark_next, { desc = 'Next bookmark', buffer = bufnr })
+          map('n', '<leader>bp', bm.bookmark_prev, { desc = 'Prev bookmark', buffer = bufnr })
+          map('n', '<leader>bl', bm.bookmark_list, { desc = 'List bookmarks', buffer = bufnr })
+          map('n', '<leader>bb', bm.bookmark_clean, { desc = 'Clear bookmarks', buffer = bufnr })
+          map('n', '<leader>BL', '<cmd>Telescope bookmarks list<cr>', { desc = 'All bookmarks', buffer = bufnr })
+        end,
+      })
+      require('telescope').load_extension('bookmarks')
+    end,
+  },
+
+  -- Confirm before quitting Neovim
+  {
+    'yutkat/confirm-quit.nvim',
+    event = 'CmdlineEnter',
+    opts = {},
+  },
+
+  -- Vim-illuminate: Highlight word under cursor (like VS Code)
+  {
+    'RRethy/vim-illuminate',
+    event = 'BufReadPost',
+    config = function()
+      require('illuminate').configure({
+        delay = 100,
+        filetypes_denylist = { 'neo-tree', 'Trouble', 'alpha' },
+      })
+    end,
+  },
+
+  -- CamelCaseMotion (VS Code vim.camelCaseMotion.enable)
+  {
+    'bkad/CamelCaseMotion',
+    init = function()
+      vim.g.camelcasemotion_key = ','
+    end,
+  },
 
 }
 
-require("lazy").setup(plugins, opts)
+require("lazy").setup(plugins)
+
+-- Inlay hints highlight (if colorscheme doesn't support it)
+vim.api.nvim_set_hl(0, 'LspInlayHint', { fg = '#7f8c8d', bg = 'NONE', italic = true })
+
+-- Diagnostic virtual text (inline error messages)
+vim.diagnostic.config({
+  virtual_text = {
+    prefix = '●',
+    spacing = 4,
+  },
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+  float = {
+    border = 'rounded',
+    source = true,
+  },
+})
 
 -- todo: finish setting up copilot https://github.com/zbirenbaum/copilot.lua?ref=tamerlan.dev
 
