@@ -627,12 +627,12 @@ local plugins = {
           on_attach = function(client, bufnr)
             local opts = { buffer = bufnr }
 
-            -- Enable inlay hints (Neovim 0.10+) with delay for rust-analyzer
-            if vim.lsp.inlay_hint then
-              vim.defer_fn(function()
-                vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-              end, 500)
-            end
+            -- DISABLED: Neovim 0.11.x inlay_hint bug
+            -- if vim.lsp.inlay_hint then
+            --   vim.defer_fn(function()
+            --     vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+            --   end, 500)
+            -- end
 
             -- Rust-specific keymaps
             vim.keymap.set('n', '<leader>ra', function() vim.cmd.RustLsp('codeAction') end, { buffer = bufnr, desc = 'Rust code action' })
@@ -646,9 +646,10 @@ local plugins = {
             vim.keymap.set('n', '<leader>rh', function() vim.cmd.RustLsp({ 'hover', 'actions' }) end, { buffer = bufnr, desc = 'Hover actions' })
             vim.keymap.set('n', '<leader>re', function() vim.cmd.RustLsp('explainError') end, { buffer = bufnr, desc = 'Explain error' })
             vim.keymap.set('n', '<leader>rD', function() vim.cmd.RustLsp('renderDiagnostic') end, { buffer = bufnr, desc = 'Render diagnostic' })
-            vim.keymap.set('n', '<leader>ri', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
-            end, { buffer = bufnr, desc = 'Toggle inlay hints' })
+            -- DISABLED: Neovim 0.11.x inlay_hint bug
+            -- vim.keymap.set('n', '<leader>ri', function()
+            --   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
+            -- end, { buffer = bufnr, desc = 'Toggle inlay hints' })
           end,
           default_settings = {
             ['rust-analyzer'] = {
@@ -1344,3 +1345,14 @@ vim.diagnostic.config({
 --   style = "default",            -- default, modern (requires dressing.nvim and nui.nvim), telescope (requires telescope.nvim)
 --   close_mapping = "<Esc><Esc>", -- only for the default style window.
 -- })
+
+-- DISABLED: Global inlay hints disable for Neovim 0.11.x bug
+-- Diagnostics (errors/warnings) will still work normally
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client and vim.lsp.inlay_hint then
+      pcall(vim.lsp.inlay_hint.enable, false, { bufnr = args.buf })
+    end
+  end,
+})
