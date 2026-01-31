@@ -74,7 +74,8 @@ require('mini.surround').setup({
 require('mini.ai').setup({})
 require('mini.bufremove').setup({})
 require('mini.bracketed').setup({})
-require('mini.clue').setup({
+-- mini.clue disabled (sağ taraftaki yardımcı menü)
+--[[ require('mini.clue').setup({
   window = {
     delay = 0,
     width = 'auto'
@@ -129,7 +130,7 @@ require('mini.clue').setup({
     { mode = 'n', keys = ']',         desc = '+Next' },
     { mode = 'n', keys = '[',         desc = '+Prev' },
   },
-})
+}) --]]
 
 --require('mini.files').setup {
 --
