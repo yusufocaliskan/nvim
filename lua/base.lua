@@ -15,9 +15,50 @@ vim.scriptencoding = 'utf-8'
 vim.opt.encoding = 'utf-8'
 vim.opt.fileencoding = 'utf-8'
 
-vim.opt.showtabline = 2
+-- Font for GUI clients (Neovide, nvim-qt, VimR, etc.)
+-- Terminal nvim uses the terminal's font — set it in Ghostty/iTerm2 separately.
+vim.opt.guifont = 'JetBrains Mono NL:h16'
+
+vim.opt.showtabline = 0  -- never show tabline
+
+-- Per-split filename badge at the top-right of each window (via winbar)
+vim.opt.winbar = '%=%t %m '
+
+-- Hide winbar in terminals, file explorers, and other special buffers
+vim.api.nvim_create_autocmd({ 'BufWinEnter', 'FileType', 'TermOpen' }, {
+  callback = function()
+    local bt = vim.bo.buftype
+    local ft = vim.bo.filetype
+    if bt ~= '' or ft == 'neo-tree' or ft == 'NvimTree' or ft == 'snacks_dashboard' then
+      vim.wo.winbar = ''
+    end
+  end,
+})
+
+-- Transparent winbar background (re-apply after every colorscheme change)
+local function set_winbar_hl()
+  vim.api.nvim_set_hl(0, 'WinBar',   { bg = 'NONE', fg = '#a7c080', bold = true })
+  vim.api.nvim_set_hl(0, 'WinBarNC', { bg = 'NONE', fg = '#7a8478' })
+end
+set_winbar_hl()
+vim.api.nvim_create_autocmd('ColorScheme', { callback = set_winbar_hl })
 -- Session: save buffers, splits, tabs, cursor position, folds
-vim.opt.sessionoptions = 'buffers,curdir,folds,tabpages,winsize,winpos,localoptions'
+vim.opt.sessionoptions = 'buffers,curdir,folds,tabpages,winsize,winpos,resize,localoptions'
+
+-- Keep manual window sizes — don't auto-equalize on split/close
+vim.opt.equalalways = false
+
+-- ...but after a window is closed, re-equalize the remaining splits.
+-- Terminal panels keep their height because winfixheight = true.
+vim.api.nvim_create_autocmd('WinClosed', {
+  callback = function()
+    vim.schedule(function()
+      if #vim.api.nvim_list_wins() > 1 then
+        vim.cmd('wincmd =')
+      end
+    end)
+  end,
+})
 
 vim.opt.completeopt = 'menu,menuone,noselect'
 

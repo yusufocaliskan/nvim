@@ -109,7 +109,6 @@ local plugins = {
       { "<leader>br", function() Snacks.rename.rename_file() end, desc = "[r]ename File" },
       { "<leader>gB", function() Snacks.gitbrowse() end,          desc = "Git Browse" },
       { "<leader>gb", function() Snacks.git.blame_line() end,     desc = "Git Blame Line" },
-      { "<leader>gf", function() Snacks.lazygit.log_file() end,   desc = "Lazygit Current File History" },
       { "<leader>gg", function() Snacks.lazygit() end,            desc = "Lazygit" },
       { "<leader>gl", function() Snacks.lazygit.log() end,        desc = "Lazygit Log (cwd)" },
       { "<c-\\>",     function() Snacks.terminal() end,           desc = "Toggle Terminal" },
@@ -136,8 +135,12 @@ local plugins = {
       icons_enabled = false,
       theme = 'auto',
       sections = {
+        lualine_c = { { 'filename', path = 0 } },  -- filename only, no path
         lualine_x = { 'encoding' },
-      }
+      },
+      inactive_sections = {
+        lualine_c = { { 'filename', path = 0 } },
+      },
     }
   },
 
@@ -240,9 +243,19 @@ local plugins = {
           previewer = false,
         },
 
-        -- Pre save: close special windows
+        -- Pre save: close special windows + persist terminal panel separately
         pre_save_cmds = {
           function()
+            -- Save TermPanel state to its own JSON before wiping buffers
+            if _G.TermPanel and _G.TermPanel.save then
+              pcall(_G.TermPanel.save)
+            end
+            -- Wipe terminal buffers so they don't pollute the session file
+            for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+              if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buftype == 'terminal' then
+                pcall(vim.api.nvim_buf_delete, buf, { force = true })
+              end
+            end
             -- Close neo-tree, nvim-tree, etc.
             vim.cmd('silent! Neotree close')
             -- Close any floating windows
@@ -255,10 +268,13 @@ local plugins = {
           end
         },
 
-        -- Post restore: equalize windows
+        -- Post restore: equalize windows + restore terminal panel from JSON
         post_restore_cmds = {
           function()
             vim.cmd('wincmd =')
+            if _G.TermPanel and _G.TermPanel.restore then
+              vim.defer_fn(function() pcall(_G.TermPanel.restore) end, 30)
+            end
           end
         },
       })
@@ -275,6 +291,16 @@ local plugins = {
     }
   },
   { "nvim-telescope/telescope-file-browser.nvim", lazy = true },
+
+  -- fzf-lua: faster fuzzy finder (replaces user-facing Telescope keymaps)
+  {
+    'ibhagwan/fzf-lua',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    cmd = 'FzfLua',
+    opts = {
+      winopts = { preview = { default = 'bat' } },
+    },
+  },
 
   {
     'nvim-treesitter/nvim-treesitter',
@@ -617,8 +643,8 @@ local plugins = {
             auto_focus = true,
           },
           inlay_hints = {
-            auto = true,
-            show_parameter_hints = true,
+            auto = false,
+            show_parameter_hints = false,
           },
         },
         -- LSP configuration
@@ -797,26 +823,27 @@ local plugins = {
     },
   },
 
-  -- {
-  --   'zbirenbaum/copilot.lua',
-  --   cmd = "Copilot",
-  --   event = "InsertEnter",
-  --   config = function()
-  --     require("copilot").setup({
-  --       suggestion = {
-  --         enabled = true,
-  --         auto_trigger = true,  -- Enable auto-trigger
-  --         keymap = {
-  --           accept = "<Tab>",      -- Tab to accept
-  --           accept_word = "<C-k>", -- Ctrl+K to accept word
-  --           next = "<C-j>",        -- Ctrl+J for next suggestion
-  --           prev = "<C-h>",        -- Ctrl+H for previous suggestion
-  --           dismiss = "<C-e>",     -- Ctrl+E to dismiss
-  --         }
-  --       }
-  --     })
-  --   end,
-  -- },
+  {
+    'zbirenbaum/copilot.lua',
+    enabled = false,
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      require("copilot").setup({
+        suggestion = {
+          enabled = true,
+          auto_trigger = true,
+          keymap = {
+            accept = "<Tab>",
+            accept_word = "<C-k>",
+            next = "<C-j>",
+            prev = "<C-h>",
+            dismiss = "<C-e>",
+          }
+        }
+      })
+    end,
+  },
 
   {
     "folke/flash.nvim",
@@ -841,11 +868,37 @@ local plugins = {
     },
   },
 
-  -- VS Code-like comment plugin
+  -- which-key: popup with all keybindings after <leader>
+  {
+    'folke/which-key.nvim',
+    event = 'VeryLazy',
+    opts = {
+      preset = 'modern',
+      delay = 300,
+    },
+  },
+
+  -- nvim-surround: add/change/delete surrounding pairs (cs"' , ysiw<tag>, ds")
+  {
+    'kylechui/nvim-surround',
+    version = '*',
+    event = 'VeryLazy',
+    opts = {},
+  },
+
+  -- schemastore: JSON/YAML schemas for jsonls/yamlls (auto-completes package.json, tsconfig, etc.)
+  { 'b0o/schemastore.nvim', lazy = true },
+
+  -- VS Code-like comment plugin (JSX/TSX-aware via ts-context-commentstring)
   {
     'numToStr/Comment.nvim',
+    dependencies = { 'JoosepAlviste/nvim-ts-context-commentstring' },
     config = function()
-      require('Comment').setup()
+      require('ts_context_commentstring').setup({ enable_autocmd = false })
+      vim.g.skip_ts_context_commentstring_module = true
+      require('Comment').setup({
+        pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
+      })
     end,
     keys = {
       { "<leader>c", "<Plug>(comment_toggle_linewise_current)", desc = "Comment line" },
@@ -1027,6 +1080,8 @@ local plugins = {
       if ok then
         capabilities = vim.tbl_deep_extend('force', capabilities, cmp_lsp.default_capabilities())
       end
+      -- Disable inlay hints at capability level (Neovim 0.11.x inlay_hint col bug)
+      capabilities.textDocument.inlayHint = nil
 
       require('mason-lspconfig').setup({
         ensure_installed = {
@@ -1167,44 +1222,11 @@ local plugins = {
     opts = {},
   },
 
-  -- Noice: Better UI for messages, cmdline, popupmenu (animations disabled)
-  {
-    'folke/noice.nvim',
-    event = 'VeryLazy',
-    dependencies = {
-      'MunifTanjim/nui.nvim',
-      'rcarriga/nvim-notify',
-    },
-    opts = {
-      -- Disable animations for performance
-      animate = {
-        enabled = false,
-      },
-      routes = {
-        -- Yank mesajlarını gizle
-        { filter = { event = 'msg_show', find = 'yanked' }, opts = { skip = true } },
-        { filter = { event = 'msg_show', find = 'fewer lines' }, opts = { skip = true } },
-        { filter = { event = 'msg_show', find = 'more lines' }, opts = { skip = true } },
-        { filter = { event = 'msg_show', find = 'lines yanked' }, opts = { skip = true } },
-      },
-      lsp = {
-        override = {
-          ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
-          ['vim.lsp.util.stylize_markdown'] = true,
-          ['cmp.entry.get_documentation'] = true,
-        },
-        -- Disable LSP progress for performance (use native)
-        progress = { enabled = false },
-      },
-      presets = {
-        bottom_search = true,
-        command_palette = true,
-        long_message_to_split = true,
-        inc_rename = false,
-        lsp_doc_border = true,
-      },
-    },
-  },
+  -- Noice / nvim-notify disabled: use Vim's default echo messages
+  -- {
+  --   'folke/noice.nvim',
+  --   enabled = false,
+  -- },
 
   -- Todo-comments: Highlight TODO, FIXME, etc.
   {
@@ -1327,21 +1349,67 @@ require("lazy").setup(plugins)
 -- Inlay hints highlight (if colorscheme doesn't support it)
 vim.api.nvim_set_hl(0, 'LspInlayHint', { fg = '#7f8c8d', bg = 'NONE', italic = true })
 
--- Diagnostic virtual text (inline error messages)
+-- VS Code style diagnostics
 vim.diagnostic.config({
   virtual_text = {
-    prefix = '●',
     spacing = 4,
+    prefix = '',
+    format = function(d)
+      local source = d.source and string.format(" [%s]", d.source) or ""
+      return string.format("%s%s", d.message, source)
+    end,
+    filter = function(diagnostics)
+      -- deduplicate: same message on same line -> sadece bir kez goster
+      local seen = {}
+      local result = {}
+      for _, d in ipairs(diagnostics) do
+        if not seen[d.message] then
+          seen[d.message] = true
+          table.insert(result, d)
+        end
+      end
+      -- sadece ilk (en agir) hatay goster, geri kalanlar hover/Trouble'da
+      return { result[1] }
+    end,
   },
-  signs = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN]  = "",
+      [vim.diagnostic.severity.INFO]  = "",
+      [vim.diagnostic.severity.HINT]  = "",
+    },
+  },
   underline = true,
   update_in_insert = false,
   severity_sort = true,
   float = {
     border = 'rounded',
     source = true,
+    header = '',
+    prefix = function(diag)
+      local icons = { "", "", "", "" }
+      return icons[diag.severity] .. " ", ""
+    end,
   },
 })
+
+-- VS Code style highlight groups
+vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextError', { fg = '#f44747', italic = true })
+vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextWarn',  { fg = '#ce9178', italic = true })
+vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextInfo',  { fg = '#9cdcfe', italic = true })
+vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextHint',  { fg = '#9cdcfe', italic = true })
+vim.api.nvim_set_hl(0, 'DiagnosticSignError',        { fg = '#f44747' })
+vim.api.nvim_set_hl(0, 'DiagnosticSignWarn',         { fg = '#ce9178' })
+vim.api.nvim_set_hl(0, 'DiagnosticSignInfo',         { fg = '#9cdcfe' })
+vim.api.nvim_set_hl(0, 'DiagnosticSignHint',         { fg = '#9cdcfe' })
+vim.api.nvim_set_hl(0, 'DiagnosticUnderlineError',   { undercurl = true, sp = '#f44747' })
+vim.api.nvim_set_hl(0, 'DiagnosticUnderlineWarn',    { undercurl = true, sp = '#ce9178' })
+vim.api.nvim_set_hl(0, 'DiagnosticUnderlineInfo',    { undercurl = true, sp = '#9cdcfe' })
+vim.api.nvim_set_hl(0, 'DiagnosticUnderlineHint',    { undercurl = true, sp = '#9cdcfe' })
+
+-- Neovim 0.11 built-in treesitter diagnostics kapatma (duplicate hata kaynagi)
+vim.diagnostic.enable(false, { ns_id = vim.api.nvim_create_namespace('vim.treesitter') })
 
 -- todo: finish setting up copilot https://github.com/zbirenbaum/copilot.lua?ref=tamerlan.dev
 
@@ -1353,13 +1421,5 @@ vim.diagnostic.config({
 --   close_mapping = "<Esc><Esc>", -- only for the default style window.
 -- })
 
--- DISABLED: Global inlay hints disable for Neovim 0.11.x bug
--- Diagnostics (errors/warnings) will still work normally
-vim.api.nvim_create_autocmd('LspAttach', {
-  callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and vim.lsp.inlay_hint then
-      pcall(vim.lsp.inlay_hint.enable, false, { bufnr = args.buf })
-    end
-  end,
-})
+-- Neovim 0.11.x inlay_hint col bug workaround: handler'i override et
+vim.lsp.handlers['textDocument/inlayHint'] = function() return {} end

@@ -329,10 +329,12 @@ local function toggle_terminal(direction, command)
   end
 end
 
-vim.keymap.set('n', '<leader>tt', function() toggle_terminal("fullscreen") end, named_opts('Toggle Fullscreen Terminal'))
-vim.keymap.set('n', '<leader>tv', function() toggle_terminal("vsplit") end, named_opts('Toggle Vertical Terminal'))
-vim.keymap.set('n', '<leader>th', function() toggle_terminal("split") end, named_opts('Toggle Horizontal Terminal'))
-vim.keymap.set('n', '<leader>tc', function() toggle_terminal("vsplit", "claude") end, named_opts('Toggle Vertical Terminal with Claude'))
+-- Old <leader>t* terminal toggles disabled — replaced by TermPanel (<leader>t).
+-- They caused 2s delay on <leader>t because of timeoutlen waiting for next key.
+-- vim.keymap.set('n', '<leader>tt', function() toggle_terminal("fullscreen") end, named_opts('Toggle Fullscreen Terminal'))
+-- vim.keymap.set('n', '<leader>tv', function() toggle_terminal("vsplit") end, named_opts('Toggle Vertical Terminal'))
+-- vim.keymap.set('n', '<leader>th', function() toggle_terminal("split") end, named_opts('Toggle Horizontal Terminal'))
+-- vim.keymap.set('n', '<leader>tc', function() toggle_terminal("vsplit", "claude") end, named_opts('Toggle Vertical Terminal with Claude'))
 
 -- vim.keymap.set('n', '<leader>ho', '<cmd>lua edit_neovim()<cr>', named_opts('[O]pen config dir'))
 -- vim.keymap.set('n', '<leader>hs', '<cmd>source %<cr>', named_opts('Source current buffer'))
